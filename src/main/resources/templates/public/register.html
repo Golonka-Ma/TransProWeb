@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Rejestracja</title>
+  <link rel="stylesheet" th:href="@{/css/output.css}">
+  <!-- Czcionki Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 dark:bg-darkPrimary bg-pattern">
+<div class="min-h-screen flex items-center justify-center">
+  <div class="max-w-md w-full bg-darkSecondary bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-xl rounded-xl px-10 py-8">
+    <!-- Logo -->
+    <div class="flex justify-center mb-6">
+      <img src="/media/app/logo.png" alt="Logo firmy" style="height: 120px">
+    </div>
+    <!-- Nagłówek -->
+    <h2 class="text-3xl font-extrabold text-center mb-2 text-white">Dołącz do nas!</h2>
+    <p class="text-center text-gray-300 mb-8">Utwórz nowe konto</p>
+    <!-- Formularz -->
+    <form th:action="@{/register}" th:object="${user}" method="post" class="space-y-6" onsubmit="return validateForm()">
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-300">Nazwa użytkownika</label>
+        <div class="mt-1 relative">
+          <input type="text" name="username" id="username" th:field="*{username}" required
+                 class="appearance-none block w-full pl-3 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-secondary focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 transition duration-150 ease-in-out">
+          <!-- Ikona użytkownika -->
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <svg class="h-5 w-5 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/>
+              <path d="M2 20c0-4 4-7 10-7s10 3 10 7"/>
+            </svg>
+          </div>
+        </div>
+        <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-red-500 text-sm"></span>
+      </div>
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
+        <div class="mt-1 relative">
+          <input type="email" name="email" id="email" th:field="*{email}" required
+                 class="appearance-none block w-full pl-3 pr-4 py-3 border border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-secondary focus:border-transparent text-white bg-gray-700 transition duration-150 ease-in-out">
+          <!-- Ikona email -->
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <svg class="h-5 w-5 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16v16H4z"/>
+              <path d="M22 6l-10 7L2 6"/>
+            </svg>
+          </div>
+        </div>
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-500 text-sm"></span>
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-300">Hasło</label>
+        <div class="mt-1 relative">
+          <input type="password" name="password" id="password" th:field="*{password}" required
+                 class="appearance-none block w-full pl-3 pr-4 py-3 border border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-secondary focus:border-transparent text-white bg-gray-700 transition duration-150 ease-in-out">
+          <!-- Ikona kłódki -->
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <svg class="h-5 w-5 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0110 0v4"></path>
+            </svg>
+          </div>
+        </div>
+        <span id="passwordError" class="text-red-500 text-sm" hidden="hidden"></span>
+      </div>
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-300">Potwierdź hasło</label>
+        <div class="mt-1 relative">
+          <input type="password" name="confirmPassword" id="confirmPassword" required
+                 class="appearance-none block w-full pl-3 pr-4 py-3 border border-gray-600 rounded-lg shadow-sm placeholder-gray-500 focus:outline-none focus:ring-secondary focus:border-transparent text-white bg-gray-700 transition duration-150 ease-in-out">
+          <!-- Ikona kłódki -->
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <svg class="h-5 w-5 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0110 0v4"></path>
+            </svg>
+          </div>
+        </div>
+        <span id="confirmPasswordError" class="text-red-500 text-sm"></span>
+      </div>
+      <div>
+        <button type="submit"
+                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg
+                                       text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700
+                                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                                       transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-105
+                                       dark:bg-secondary dark:hover:bg-secondary-dark dark:focus:ring-secondary">
+          Zarejestruj się
+        </button>
+      </div>
+    </form>
+    <p class="mt-8 text-center text-sm text-gray-400">
+      Masz już konto?
+      <a th:href="@{/login}" class="font-medium text-indigo-600 dark:text-gold hover:text-indigo-500 dark:hover:text-secondary-dark">
+        Zaloguj się
+      </a>
+    </p>
+  </div>
+</div>
+<!-- Skrypt do walidacji haseł -->
+<script>
+  function validateForm() {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+    // Resetowanie komunikatów błędów
+    passwordError.textContent = '';
+    confirmPasswordError.textContent = '';
+
+    if (password.value !== confirmPassword.value) {
+      passwordError.textContent = 'Hasła nie są identyczne.';
+      confirmPasswordError.textContent = 'Hasła nie są identyczne.';
+      return false; // Zatrzymuje wysyłanie formularza
+    }
+
+    return true; // Pozwala na wysłanie formularza
+  }
+</script>
+</body>
+</html>

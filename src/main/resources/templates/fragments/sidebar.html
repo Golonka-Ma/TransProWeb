@@ -1,0 +1,54 @@
+<!-- templates/fragments/sidebar.html -->
+<div th:fragment="sidebar">
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 w-64 h-screen bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg text-white flex flex-col shadow-lg z-50 transition-transform transform -translate-x-full md:translate-x-0">
+    <!-- Nagłówek Sidebaru -->
+    <div class="p-6 flex items-center justify-between border-b border-gray-700">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <img src="media/app/logo.png" alt="Logo" class="h-10 w-auto">
+        <span class="ml-3 text-2xl font-semibold">TransPro</span>
+      </div>
+      <!-- Przycisk zamykający na urządzeniach mobilnych -->
+      <button class="md:hidden focus:outline-none" onclick="toggleSidebar()">
+        <i class="fas fa-times text-gray-300"></i>
+      </button>
+    </div>
+    <!-- Menu Nawigacyjne -->
+    <nav class="flex-1 px-4 py-6">
+      <ul class="space-y-2">
+        <li>
+          <a th:href="@{/}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-white hover:bg-opacity-20 transition duration-200">
+            <i class="fas fa-home text-gray-300 group-hover:text-white mr-3"></i>
+            <span class="group-hover:text-white">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a th:href="@{/settings}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-white hover:bg-opacity-20 transition duration-200">
+            <i class="fas fa-cog text-gray-300 group-hover:text-white mr-3"></i>
+            <span class="group-hover:text-white">Ustawienia</span>
+          </a>
+        </li>
+        <!-- Dodaj więcej elementów menu -->
+      </ul>
+    </nav>
+    <!-- Przyciski na dole -->
+    <div class="px-4 py-6 border-t border-gray-700">
+      <!-- Przycisk zmiany motywu -->
+      <button id="theme-toggle" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-white hover:bg-opacity-20 transition duration-200" onclick="toggleTheme()">
+        <i id="theme-icon" class="fas fa-moon text-gray-300 mr-3"></i>
+        <span id="theme-text">Tryb ciemny</span>
+      </button>
+      <!-- Przycisk wylogowania -->
+      <form th:action="@{/logout}" method="post" class="mt-4">
+        <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-red-600 hover:bg-opacity-80 transition duration-200">
+          <i class="fas fa-sign-out-alt text-gray-300 mr-3"></i>
+          <span class="group-hover:text-white">Wyloguj się</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+  <!-- Nakładka mobilna -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+</div>

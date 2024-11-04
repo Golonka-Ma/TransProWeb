@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" data-theme-mode="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <!-- Czcionki Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 dark:bg-darkPrimary bg-pattern">
+<div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full bg-white dark:bg-darkSecondary bg-opacity-90 dark:bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-xl rounded-xl px-10 py-8">
+        <!-- Logo -->
+        <!-- Możesz dodać logo tutaj -->
+        <div class="flex justify-center mb-6">
+            <img src="/media/app/logo.png" alt="Logo firmy" style="height: 120px">
+        </div>
+        <!-- Nagłówek -->
+        <h2 class="text-3xl font-extrabold text-center mb-2 text-gray-900 dark:text-white">Witamy z powrotem!</h2>
+        <p class="text-center text-gray-700 dark:text-gray-300 mb-8">Zaloguj się do swojego konta</p>
+        <!-- Formularz -->
+        <form th:action="@{/login}" method="post" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa użytkownika</label>
+                <div class="mt-1 relative">
+                    <input type="text" name="username" id="username" required
+                           class="appearance-none block w-full pl-3 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-secondary focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 transition duration-150 ease-in-out">
+                    <!-- Ikona użytkownika -->
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <svg class="h-5 w-5 text-gray-400 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hasło</label>
+                <div class="mt-1 relative">
+                    <input type="password" name="password" id="password" required
+                           class="appearance-none block w-full pl-3 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-secondary focus:border-transparent text-gray-900 dark:text-white bg-white dark:bg-gray-700 transition duration-150 ease-in-out">
+                    <!-- Ikona hasła jako przycisk -->
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <button type="button" onclick="togglePasswordVisibility()" class="focus:outline-none">
+                            <!-- Ikona otwartego oka -->
+                            <svg id="password-eye-open" class="h-5 w-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <!-- Kod SVG dla otwartego oka -->
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7S3.732 16.057 2.458 12z" />
+                            </svg>
+                            <!-- Ikona zamkniętego oka -->
+                            <svg id="password-eye-closed" class="h-5 w-5 text-gray-300 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                                <path d="M22 12C22 12 19 18 12 18C5 18 2 12 2 12C2 12 5 6 12 6C19 6 22 12 22 12Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M3 21L20 4"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember_me" name="remember_me" type="checkbox"
+                           class="h-4 w-4 text-indigo-600 dark:text-secondary focus:ring-indigo-500 dark:focus:ring-secondary border-gray-300 dark:border-gray-600 rounded">
+                    <label for="remember_me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Zapamiętaj mnie</label>
+                </div>
+                <div class="text-sm">
+                    <a th:href="@{/recovery}" class="font-medium text-indigo-600 dark:text-gold hover:text-indigo-500 dark:hover:text-secondary-dark">Zapomniałeś hasła?</a>
+                </div>
+            </div>
+            <div>
+                <button type="submit"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg
+                                       text-base font-semibold text-white bg-indigo-600 hover:bg-indigo-700
+                                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                                       transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-105
+                                       dark:bg-secondary dark:hover:bg-secondary-dark dark:focus:ring-secondary">
+                    Zaloguj się
+                </button>
+            </div>
+        </form>
+        <p class="mt-8 text-center text-sm text-gray-700 dark:text-gray-400">
+            Nie masz konta?
+            <a th:href="@{/register}" class="font-medium text-indigo-600 dark:text-gold hover:text-indigo-500 dark:hover:text-secondary-dark">
+                Zarejestruj się
+            </a>
+        </p>
+    </div>
+</div>
+<!-- Skrypt do przełączania widoczności hasła -->
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const passwordEyeOpen = document.getElementById('password-eye-open');
+        const passwordEyeClosed = document.getElementById('password-eye-closed');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordEyeOpen.classList.add('hidden');
+            passwordEyeClosed.classList.remove('hidden');
+        } else {
+            passwordInput.type = 'password';
+            passwordEyeOpen.classList.remove('hidden');
+            passwordEyeClosed.classList.add('hidden');
+        }
+    }
+</script>
+
+</script>
+</body>
+</html>
