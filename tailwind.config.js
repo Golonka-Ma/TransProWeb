@@ -17,6 +17,7 @@ module.exports = {
         darkSecondary: '#0E261D',
         gold: '#6b5c0f',
         field_gray: '#C3C3C3',
+
       },
     },
   },

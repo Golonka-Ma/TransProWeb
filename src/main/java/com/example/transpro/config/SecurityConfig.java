@@ -20,19 +20,19 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Konfiguracja SecurityFilterChain
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**","/public/**","media/**").permitAll()
+                        .requestMatchers("/login", "/register","/recovery", "/css/**", "/js/**", "/images/**","/public/**","media/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/home", true)
                         .permitAll()
                 )
                 .logout(logout -> logout

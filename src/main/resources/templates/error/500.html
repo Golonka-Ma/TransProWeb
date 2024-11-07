@@ -1,10 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="h-full" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bład 500</title>
+  <title>AdminPanel - Error 500</title>
+  <meta charset="utf-8"/>
+  <meta content="follow, index" name="robots"/>
+  <meta content="Error 500 page, using Tailwind CSS" name="description"/>
+
+  <link rel="stylesheet" th:href="@{/css/output.css}">
 </head>
-<body>
-<h1>Bład 500</h1>
+<body class="antialiased flex h-full text-base text-gray-700 bg-white dark:bg-gray-800">
+<main class="flex-grow flex flex-col items-center justify-center">
+  <div class="mb-10">
+    <img id="theme-image" alt="image" class="max-h-[160px]" src="media/illustrations/20.svg"/>
+  </div>
+  <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 border border-blue-500 rounded-full mb-3">
+            500 Error
+        </span>
+  <h3 class="text-2xl font-semibold text-gray-900 dark:text-white text-center mb-2">
+    Coś poszło nie tak...
+  </h3>
+  <div class="text-md font-medium text-center text-gray-600 dark:text-gray-300 mb-10">
+    Wewnętrzny błąd serwera. Spróbuj ponownie za chwilę.
+    <a class="text-blue-600 font-medium hover:underline" href="/home">
+      Powrót do ekranu startowego
+    </a>.
+  </div>
+</main>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const img = document.getElementById('theme-image');
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function updateImage() {
+      if (darkModeMediaQuery.matches) {
+        img.src = 'media/illustrations/20-dark.svg';
+      } else {
+        img.src = 'media/illustrations/20.svg';
+      }
+    }
+
+    darkModeMediaQuery.addEventListener('change', updateImage);
+    updateImage();
+  });
+</script>
 </body>
 </html>

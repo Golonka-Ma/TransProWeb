@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TransPro - Zarządzanie Kierowcami</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="sm:ml-64 p-8" x-data="driversPage()">
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Kierowcy</h1>
+        <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" @click="showModal = true">
+            <i class="fa fa-plus mr-2"></i>Dodaj kierowcę
+        </button>
+    </header>
+
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <table id="driversTable" class="display w-full">
+            <thead>
+            <tr>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Numer licencji</th>
+                <th>Data ważności licencji</th>
+                <th>Numer karty tachografu</th>
+                <th>Data ważności karty</th>
+                <th>Akcje</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Data is populated dynamically -->
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Modal do dodawania/edycji kierowcy -->
+    <div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj nowego kierowcę</h2>
+            <form @submit.prevent="handleFormSubmit">
+                <div class="mb-4">
+                    <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Imię</label>
+                    <input type="text" id="firstName" x-model="driver.firstName" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div class="mb-4">
+                    <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwisko</label>
+                    <input type="text" id="lastName" x-model="driver.lastName" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div class="mb-4">
+                    <label for="licenseNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer licencji</label>
+                    <input type="text" id="licenseNumber" x-model="driver.licenseNumber" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div class="mb-4">
+                    <label for="licenseExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności licencji</label>
+                    <input type="date" id="licenseExpiryDate" x-model="driver.licenseExpiryDate" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div class="mb-4">
+                    <label for="tachoCardNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer karty tachografu</label>
+                    <input type="text" id="tachoCardNumber" x-model="driver.tachoCardNumber"
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div class="mb-4">
+                    <label for="tachoCardExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności karty tachografu</label>
+                    <input type="date" id="tachoCardExpiryDate" x-model="driver.tachoCardExpiryDate"
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" @click="showModal = false">Anuluj</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Skrypty JS -->
+<script>
+    function driversPage() {
+        return {
+            showModal: false,
+            driver: {
+                firstName: '',
+                lastName: '',
+                licenseNumber: '',
+                licenseExpiryDate: '',
+                tachoCardNumber: '',
+                tachoCardExpiryDate: ''
+            },
+            handleFormSubmit() {
+                Swal.fire('Zapisano!', 'Dane kierowcy zostały zapisane pomyślnie.', 'success');
+                this.showModal = false;
+                this.driver = {
+                    firstName: '',
+                    lastName: '',
+                    licenseNumber: '',
+                    licenseExpiryDate: '',
+                    tachoCardNumber: '',
+                    tachoCardExpiryDate: ''
+                };
+            }
+        };
+    }
+
+    $(document).ready(function () {
+        $('#driversTable').DataTable({
+            "ajax": {
+                "url": "/api/drivers",
+                "dataSrc": "",
+                "error": function (xhr, error, thrown) {
+                    Swal.fire('Błąd!', 'Nie udało się pobrać danych.', 'error');
+                }
+            },
+            "columns": [
+                { "data": "firstName" },
+                { "data": "lastName" },
+                { "data": "licenseNumber" },
+                { "data": "licenseExpiryDate" },
+                { "data": "tachoCardNumber" },
+                { "data": "tachoCardExpiryDate" },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return `
+                            <button class="bg-yellow-500 text-white px-2 py-1 rounded" onclick="editDriver(${row.id})">Edytuj</button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="deleteDriver(${row.id})">Usuń</button>
+                        `;
+                    }
+                }
+            ]
+        });
+    });
+
+    function editDriver(id) {
+        alert('Edytowanie kierowcy ' + id);
+    }
+
+    function deleteDriver(id) {
+        Swal.fire({
+            title: 'Jesteś pewien?',
+            text: "Nie będziesz mógł tego cofnąć!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Tak, usuń to!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire('Usunięto!', 'Kierowca został usunięty.', 'success');
+            }
+        });
+    }
+</script>
+</body>
+</html>
