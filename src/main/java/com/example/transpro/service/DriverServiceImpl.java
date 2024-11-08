@@ -37,4 +37,13 @@ public class DriverServiceImpl implements DriverService {
     public Optional<Driver> findDriverById(Long id) {
         return driverRepository.findById(id);
     }
+
+    public boolean existsByLicenseNumber(String licenseNumber) {
+        return driverRepository.existsByLicenseNumber(licenseNumber);
+    }
+
+    @Override
+    public boolean existsByTachoCardNumber(String tachoCardNumber) {
+        return driverRepository.existsByTachoCardNumber(tachoCardNumber);
+    }
 }

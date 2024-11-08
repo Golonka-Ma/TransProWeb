@@ -7,18 +7,81 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/output.css}">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+<script>
+    function toggleTheme() {
+        const htmlElement = document.documentElement;
+        htmlElement.classList.toggle('dark');
+
+        const isDarkMode = htmlElement.classList.contains('dark');
+
+        const icon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDarkMode);
+            icon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        if (themeText) {
+            themeText.textContent = isDarkMode ? 'Tryb jasny' : 'Tryb ciemny';
+        }
+
+        localStorage.setItem('isDarkMode', isDarkMode);
+
+        // Load the appropriate SweetAlert2 theme
+        loadSwalTheme(isDarkMode);
+    }
+
+    function loadSwalTheme(isDarkMode) {
+        let themeLink = document.getElementById('sweetalert-theme');
+
+        if (!themeLink) {
+            themeLink = document.createElement('link');
+            themeLink.id = 'sweetalert-theme';
+            themeLink.rel = 'stylesheet';
+            document.head.appendChild(themeLink);
+        }
+
+        themeLink.href = isDarkMode
+            ? 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.min.css'
+            : 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        }
+
+        const icon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDarkMode);
+            icon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        if (themeText) {
+            themeText.textContent = isDarkMode ? 'Tryb jasny' : 'Tryb ciemny';
+        }
+
+        // Load the appropriate SweetAlert2 theme initially
+        loadSwalTheme(isDarkMode);
+    });
+
+</script>
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-<div class="sm:ml-64 p-8" x-data="driversPage()">
+<div class="sm:ml-64 p-8">
     <header class="flex justify-between items-center mb-8">
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Kierowcy</h1>
-        <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" @click="showModal = true">
+        <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="openAddModal()">
             <i class="fa fa-plus mr-2"></i>Dodaj kierowcę
         </button>
     </header>
@@ -41,83 +104,106 @@
             </tbody>
         </table>
     </section>
+</div>
 
-    <!-- Modal do dodawania/edycji kierowcy -->
-    <div x-show="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj nowego kierowcę</h2>
-            <form @submit.prevent="handleFormSubmit">
-                <div class="mb-4">
-                    <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Imię</label>
-                    <input type="text" id="firstName" x-model="driver.firstName" required
-                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
-                </div>
-                <div class="mb-4">
-                    <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwisko</label>
-                    <input type="text" id="lastName" x-model="driver.lastName" required
-                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
-                </div>
-                <div class="mb-4">
-                    <label for="licenseNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer licencji</label>
-                    <input type="text" id="licenseNumber" x-model="driver.licenseNumber" required
-                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
-                </div>
-                <div class="mb-4">
-                    <label for="licenseExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności licencji</label>
-                    <input type="date" id="licenseExpiryDate" x-model="driver.licenseExpiryDate" required
-                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
-                </div>
-                <div class="mb-4">
-                    <label for="tachoCardNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer karty tachografu</label>
-                    <input type="text" id="tachoCardNumber" x-model="driver.tachoCardNumber"
-                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
-                </div>
-                <div class="mb-4">
-                    <label for="tachoCardExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności karty tachografu</label>
-                    <input type="date" id="tachoCardExpiryDate" x-model="driver.tachoCardExpiryDate"
-                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
-                </div>
-                <div class="flex justify-end">
-                    <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" @click="showModal = false">Anuluj</button>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
-                </div>
-            </form>
-        </div>
+<!-- Modal for Adding a Driver -->
+<div id="addDriverModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj nowego kierowcę</h2>
+        <form id="addDriverForm">
+            <!-- Form fields -->
+            <div class="mb-4">
+                <label for="addFirstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Imię</label>
+                <input type="text" id="addFirstName" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="addLastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwisko</label>
+                <input type="text" id="addLastName" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="addLicenseNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer licencji</label>
+                <input type="text" id="addLicenseNumber" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="addLicenseExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności licencji</label>
+                <input type="date" id="addLicenseExpiryDate" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="addTachoCardNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer karty tachografu</label>
+                <input type="text" id="addTachoCardNumber"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="addTachoCardExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności karty tachografu</label>
+                <input type="date" id="addTachoCardExpiryDate"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" onclick="closeAddModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
     </div>
 </div>
 
-<!-- Skrypty JS -->
+<!-- Modal for Editing a Driver -->
+<div id="editDriverModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Edytuj kierowcę</h2>
+        <form id="editDriverForm">
+            <!-- Form fields -->
+            <div class="mb-4">
+                <label for="editFirstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Imię</label>
+                <input type="text" id="editFirstName" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="editLastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwisko</label>
+                <input type="text" id="editLastName" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="editLicenseNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer licencji</label>
+                <input type="text" id="editLicenseNumber" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="editLicenseExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności licencji</label>
+                <input type="date" id="editLicenseExpiryDate" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="editTachoCardNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer karty tachografu</label>
+                <input type="text" id="editTachoCardNumber"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="mb-4">
+                <label for="editTachoCardExpiryDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data ważności karty tachografu</label>
+                <input type="date" id="editTachoCardExpiryDate"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" onclick="closeEditModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    function driversPage() {
-        return {
-            showModal: false,
-            driver: {
-                firstName: '',
-                lastName: '',
-                licenseNumber: '',
-                licenseExpiryDate: '',
-                tachoCardNumber: '',
-                tachoCardExpiryDate: ''
-            },
-            handleFormSubmit() {
-                Swal.fire('Zapisano!', 'Dane kierowcy zostały zapisane pomyślnie.', 'success');
-                this.showModal = false;
-                this.driver = {
-                    firstName: '',
-                    lastName: '',
-                    licenseNumber: '',
-                    licenseExpiryDate: '',
-                    tachoCardNumber: '',
-                    tachoCardExpiryDate: ''
-                };
-            }
-        };
-    }
 
     $(document).ready(function () {
+        // Initialize DataTable
         $('#driversTable').DataTable({
             "ajax": {
                 "url": "/api/drivers",
+                "headers": {
+                    'Authorization': 'transprokey'
+                },
                 "dataSrc": "",
                 "error": function (xhr, error, thrown) {
                     Swal.fire('Błąd!', 'Nie udało się pobrać danych.', 'error');
@@ -139,14 +225,168 @@
                         `;
                     }
                 }
-            ]
+            ],
+            "language": {
+                "processing": "Przetwarzanie...",
+                "search": "Szukaj:",
+                "lengthMenu": "Pokaż _MENU_ pozycji",
+                "info": "Pozycje od _START_ do _END_ z _TOTAL_ łącznie",
+                "infoEmpty": "Pozycji 0 z 0 dostępnych",
+                "infoFiltered": "(filtrowanie spośród _MAX_ dostępnych pozycji)",
+                "loadingRecords": "Wczytywanie...",
+                "zeroRecords": "Nie znaleziono pasujących pozycji",
+                "emptyTable": "Brak danych",
+                "paginate": {
+                    "first": "Pierwsza",
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                    "last": "Ostatnia"
+                },
+                "buttons": {
+                    "copy": "Kopiuj"
+                },
+                "aria": {
+                    "sortAscending": ": aktywuj, by posortować kolumnę rosnąco",
+                    "sortDescending": ": aktywuj, by posortować kolumnę malejąco"
+                }
+            }
         });
     });
 
-    function editDriver(id) {
-        alert('Edytowanie kierowcy ' + id);
+    // Function to open the Add Driver Modal
+    function openAddModal() {
+        document.getElementById('addDriverModal').classList.remove('hidden');
+        document.getElementById('addDriverModal').classList.add('flex');
     }
 
+    // Function to close the Add Driver Modal
+    function closeAddModal() {
+        document.getElementById('addDriverModal').classList.add('hidden');
+        document.getElementById('addDriverModal').classList.remove('flex');
+        document.getElementById('addDriverForm').reset();
+    }
+
+    // Function to open the Edit Driver Modal with pre-filled data
+    function openEditModal(driver) {
+        document.getElementById('editFirstName').value = driver.firstName || '';
+        document.getElementById('editLastName').value = driver.lastName || '';
+        document.getElementById('editLicenseNumber').value = driver.licenseNumber || '';
+        document.getElementById('editLicenseExpiryDate').value = driver.licenseExpiryDate || '';
+        document.getElementById('editTachoCardNumber').value = driver.tachoCardNumber || '';
+        document.getElementById('editTachoCardExpiryDate').value = driver.tachoCardExpiryDate || '';
+
+        // Store the driver ID for later use in the edit request
+        document.getElementById('editDriverForm').dataset.driverId = driver.id;
+
+        document.getElementById('editDriverModal').classList.remove('hidden');
+        document.getElementById('editDriverModal').classList.add('flex');
+    }
+
+
+    // Function to close the Edit Driver Modal
+    function closeEditModal() {
+        document.getElementById('editDriverModal').classList.add('hidden');
+        document.getElementById('editDriverModal').classList.remove('flex');
+        document.getElementById('editDriverForm').reset();
+    }
+
+    // Function to fetch driver data and open the Edit Modal
+    function editDriver(id) {
+        $.ajax({
+            url: `/api/drivers/${id}`,
+            method: 'GET',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            success: function (driver) {
+                if (driver) {
+                    openEditModal(driver);
+                } else {
+                    Swal.fire('Błąd!', 'Nie udało się pobrać danych kierowcy.', 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('Błąd!', 'Nie udało się pobrać danych kierowcy.', 'error');
+            }
+        });
+    }
+
+    // Submit handler for Add Driver Form
+    document.getElementById('addDriverForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const driverData = {
+            firstName: document.getElementById('addFirstName').value,
+            lastName: document.getElementById('addLastName').value,
+            licenseNumber: document.getElementById('addLicenseNumber').value,
+            licenseExpiryDate: document.getElementById('addLicenseExpiryDate').value,
+            tachoCardNumber: document.getElementById('addTachoCardNumber').value,
+            tachoCardExpiryDate: document.getElementById('addTachoCardExpiryDate').value
+        };
+
+        $.ajax({
+            url: '/api/drivers/add',
+            type: 'POST',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(driverData),
+            success: function (response) {
+                Swal.fire('Zapisano!', response, 'success');
+                closeAddModal();
+                $('#driversTable').DataTable().ajax.reload();
+            },
+            error: function(xhr) {
+                if (xhr.status === 404) {
+                    Swal.fire('Błąd!', 'Kierowca o podanym ID nie został znaleziony.', 'error');
+                } else if (xhr.status === 409) {
+                    Swal.fire('Błąd!', xhr.responseText || 'Wystąpił konflikt - ten numer licencji lub numer karty tachografu już istnieje.', 'error');
+                } else {
+                    Swal.fire('Błąd!', xhr.responseText || 'Nie udało się edytować kierowcy.', 'error');
+                }
+            }
+        });
+    });
+
+    // Submit handler for Edit Driver Form
+    document.getElementById('editDriverForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const driverId = this.dataset.driverId; // Retrieve the ID stored in the data attribute
+        const driverData = {
+            firstName: document.getElementById('editFirstName').value,
+            lastName: document.getElementById('editLastName').value,
+            licenseNumber: document.getElementById('editLicenseNumber').value,
+            licenseExpiryDate: document.getElementById('editLicenseExpiryDate').value,
+            tachoCardNumber: document.getElementById('editTachoCardNumber').value,
+            tachoCardExpiryDate: document.getElementById('editTachoCardExpiryDate').value
+        };
+
+        $.ajax({
+            url: `/api/drivers/edit/${driverId}`,
+            type: 'PUT',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(driverData),
+            success: function(response) {
+                Swal.fire('Zapisano!', response, 'success');
+                closeEditModal();
+                $('#driversTable').DataTable().ajax.reload();
+            },
+            error: function(xhr) {
+                if (xhr.status === 404) {
+                    Swal.fire('Błąd!', 'Kierowca o podanym ID nie został znaleziony.', 'error');
+                } else if (xhr.status === 409) {
+                    Swal.fire('Błąd!', xhr.responseText || 'Wystąpił konflikt - ten numer licencji lub numer karty tachografu już istnieje.', 'error');
+                } else {
+                    Swal.fire('Błąd!', xhr.responseText || 'Nie udało się edytować kierowcy.', 'error');
+                }
+            }
+        });
+    });
+
+    // Delete Driver function
     function deleteDriver(id) {
         Swal.fire({
             title: 'Jesteś pewien?',
@@ -155,13 +395,29 @@
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Tak, usuń to!'
+            confirmButtonText: 'Tak, usuń to!',
+            cancelButtonText: 'Anuluj'
         }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire('Usunięto!', 'Kierowca został usunięty.', 'success');
+                $.ajax({
+                    url: `/api/drivers/delete/${id}`,
+                    type: 'DELETE',
+                    headers: {
+                        'Authorization': 'transprokey'
+                    },
+                    success: function (response) {
+                        Swal.fire('Usunięto!', response, 'success');
+                        $('#driversTable').DataTable().ajax.reload();
+                    },
+                    error: function () {
+                        Swal.fire('Błąd!', 'Nie udało się usunąć kierowcy.', 'error');
+                    }
+                });
             }
         });
     }
 </script>
+
+
 </body>
 </html>

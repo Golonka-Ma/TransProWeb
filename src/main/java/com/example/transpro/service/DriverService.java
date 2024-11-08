@@ -9,4 +9,6 @@ public interface DriverService {
     void saveDriver(Driver driver);
     void deleteDriver(Long id);
     Optional<Driver> findDriverById(Long id);
+    boolean existsByLicenseNumber(String licenseNumber);
+    boolean existsByTachoCardNumber(String tachoCardNumber);
 }
