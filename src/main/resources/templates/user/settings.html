@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html class="h-full" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
 <head>
-  <title>AdminPanel - Error 500</title>
-  <meta charset="utf-8"/>
-  <meta content="follow, index" name="robots"/>
-  <meta content="Error 500 page, using Tailwind CSS" name="description"/>
-
+  <meta charset="UTF-8">
+  <title>TransPro - Ustawienia</title>
   <link rel="stylesheet" th:href="@{/css/output.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" th:href="@{/css/all.min.css}">
 </head>
-<body class="antialiased flex h-full text-base text-gray-700 bg-white dark:bg-gray-800">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
 <script>
   function toggleTheme() {
     const htmlElement = document.documentElement;
@@ -70,43 +72,25 @@
     updateSwalAppearance(isDarkMode);
   });
 </script>
-<main class="flex-grow flex flex-col items-center justify-center">
-  <div class="mb-10">
-    <img id="theme-image" alt="image" class="max-h-[160px]" src="media/illustrations/20.svg"/>
+<!-- Pasek boczny -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<!-- Główna zawartość -->
+<div class="sm:ml-64 p-8">
+  <header class="flex justify-between items-center mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Ustawienia</h1>
+  </header>
+
+  <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Witamy na panelu!</h2>
+    <p class="text-gray-700 dark:text-gray-300">Tutaj możesz zarządzać użytkownikami, przeglądać ustawienia i wykonywać inne operacje związane z Twoją aplikacją.</p>
+  </section>
+
   </div>
-  <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 border border-blue-500 rounded-full mb-3">
-            500 Error
-        </span>
-  <h3 class="text-2xl font-semibold text-gray-900 dark:text-white text-center mb-2">
-    Coś poszło nie tak...
-  </h3>
-  <div class="text-md font-medium text-center text-gray-600 dark:text-gray-300 mb-10">
-    Wewnętrzny błąd serwera. Spróbuj ponownie za chwilę.
-    <a class="text-blue-600 font-medium hover:underline" href="/home">
-      Powrót do ekranu startowego
-    </a>.
-  </div>
-</main>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const img = document.getElementById('theme-image');
+</div>
 
-    function updateImage() {
-      // Sprawdź, czy element <html> ma klasę `dark`
-      if (document.documentElement.classList.contains('dark')) {
-        img.src = 'media/illustrations/19-dark.svg';
-      } else {
-        img.src = 'media/illustrations/19.svg';
-      }
-    }
 
-    // Wywołanie funkcji przy załadowaniu strony
-    updateImage();
 
-    // Dodanie obserwatora do zmiany klasy na elemencie <html>
-    const observer = new MutationObserver(updateImage);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-  });
-</script>
+
 </body>
 </html>

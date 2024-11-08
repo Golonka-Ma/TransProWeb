@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TransPro - Strona Główna</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+<script>
+    function toggleTheme() {
+        const htmlElement = document.documentElement;
+        htmlElement.classList.toggle('dark');
+
+        // Sprawdzenie, czy tryb ciemny jest włączony
+        const isDarkMode = htmlElement.classList.contains('dark');
+
+        // Zaktualizowanie ikony i tekstu przełącznika
+        const icon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDarkMode);
+            icon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        if (themeText) {
+            themeText.textContent = isDarkMode ? 'Tryb jasny' : 'Tryb ciemny';
+        }
+
+        // Zapamiętanie ustawienia trybu w Local Storage
+        localStorage.setItem('isDarkMode', isDarkMode);
+
+        // Zaktualizowanie wyglądu SweetAlert2
+        updateSwalAppearance(isDarkMode);
+    }
+
+    function updateSwalAppearance(isDarkMode) {
+        Swal.mixin({
+            customClass: {
+                popup: isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Przywrócenie ustawienia trybu z Local Storage
+        const isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Aktualizacja ikony i tekstu po załadowaniu strony
+        const icon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDarkMode);
+            icon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        if (themeText) {
+            themeText.textContent = isDarkMode ? 'Tryb jasny' : 'Tryb ciemny';
+        }
+
+        // Zaktualizowanie wyglądu SweetAlert2
+        updateSwalAppearance(isDarkMode);
+    });
+</script>
+<!-- Pasek boczny -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<!-- Główna zawartość -->
+<div class="sm:ml-64 p-8">
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Ekran Domowy</h1>
+    </header>
+
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Witamy na panelu!</h2>
+        <p class="text-gray-700 dark:text-gray-300">Tutaj możesz zarządzać użytkownikami, przeglądać ustawienia i wykonywać inne operacje związane z Twoją aplikacją.</p>
+    </section>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Szybki dostęp</h3>
+            <p class="text-gray-700 dark:text-gray-300">Odwiedź kluczowe sekcje swojej aplikacji, takie jak zarządzanie użytkownikami.</p>
+            <a th:href="@{/users}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Użytkownicy</a>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Ustawienia</h3>
+            <p class="text-gray-700 dark:text-gray-300">Przejdź do strony ustawień, aby dostosować konfigurację.</p>
+            <a th:href="@{/settings}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Ustawienia</a>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Statystyki</h3>
+            <p class="text-gray-700 dark:text-gray-300">Przeglądaj statystyki swojej aplikacji w czasie rzeczywistym.</p>
+            <a th:href="@{/stats}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Statystyki</a>
+        </div>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>

@@ -1,54 +1,93 @@
-<!-- templates/fragments/sidebar.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" th:href="@{/css/all.min.css}">
+</head>
+<body>
 <div th:fragment="sidebar">
-  <!-- Sidebar -->
-  <aside class="fixed inset-y-0 left-0 w-64 h-screen bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg text-white flex flex-col shadow-lg z-50 transition-transform transform -translate-x-full md:translate-x-0">
-    <!-- Nagłówek Sidebaru -->
-    <div class="p-6 flex items-center justify-between border-b border-gray-700">
-      <!-- Logo -->
-      <div class="flex items-center">
-        <img src="media/app/logo.png" alt="Logo" class="h-10 w-auto">
-        <span class="ml-3 text-2xl font-semibold">TransPro</span>
+  <!-- Pasek boczny -->
+  <aside id="sidebar"
+         class="fixed top-0 left-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform transform -translate-x-full sm:translate-x-0"
+         aria-label="Sidebar">
+    <div class="h-full flex flex-col justify-between px-3 pb-4 overflow-y-auto bg-gray-100 dark:bg-gray-800">
+      <!-- Logo i nazwa aplikacji -->
+      <div class="flex flex-col items-center pt-4">
+        <img src="/media/app/logo.png" alt="Logo firmy" class="h-16 mb-2">
+        <span class="text-2xl font-semibold text-gray-900 dark:text-white">Trans<span class="text-2xl font-semibold dark:text-red-900">Pro</span></span>
       </div>
-      <!-- Przycisk zamykający na urządzeniach mobilnych -->
-      <button class="md:hidden focus:outline-none" onclick="toggleSidebar()">
-        <i class="fas fa-times text-gray-300"></i>
-      </button>
-    </div>
-    <!-- Menu Nawigacyjne -->
-    <nav class="flex-1 px-4 py-6">
-      <ul class="space-y-2">
-        <li>
-          <a th:href="@{/}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-white hover:bg-opacity-20 transition duration-200">
-            <i class="fas fa-home text-gray-300 group-hover:text-white mr-3"></i>
-            <span class="group-hover:text-white">Dashboard</span>
+
+      <!-- Lista opcji menu -->
+      <ul class="space-y-2 font-medium flex-grow mt-6">
+        <li th:classappend="${path == '/home'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/home}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-home text-gray-500 dark:text-gray-400 mr-3"></i>
+            Ekran domowy
           </a>
         </li>
-        <li>
-          <a th:href="@{/settings}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-white hover:bg-opacity-20 transition duration-200">
-            <i class="fas fa-cog text-gray-300 group-hover:text-white mr-3"></i>
-            <span class="group-hover:text-white">Ustawienia</span>
+        <li th:classappend="${path == '/drivers'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/drivers}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-user-friends text-gray-500 dark:text-gray-400 mr-3"></i>
+            Kierowcy
           </a>
         </li>
-        <!-- Dodaj więcej elementów menu -->
+        <li th:classappend="${path == '/routes'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/routes}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-map-location-dot text-gray-500 dark:text-gray-400 mr-3"></i>
+            Trasy
+          </a>
+        </li>
+        <li th:classappend="${path == '/cargo'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/cargo}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-boxes-stacked text-gray-500 dark:text-gray-400 mr-3"></i>
+            Ładunki
+          </a>
+        </li>
+        <li th:classappend="${path == '/fleet'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/fleet}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-truck-fast text-gray-500 dark:text-gray-400 mr-3"></i>
+            Flota
+          </a>
+        </li>
+        <li th:classappend="${path == '/costs'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/costs}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-euro-sign text-gray-500 dark:text-gray-400 mr-3"></i>
+            Koszty
+          </a>
+        </li>
+        <li th:classappend="${path == '/messenger'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+          <a th:href="@{/messenger}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+            <i class="fas fa-messages text-gray-500 dark:text-gray-400 mr-3"></i>
+            Komunikator
+          </a>
+        </li>
       </ul>
-    </nav>
-    <!-- Przyciski na dole -->
-    <div class="px-4 py-6 border-t border-gray-700">
-      <!-- Przycisk zmiany motywu -->
-      <button id="theme-toggle" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-white hover:bg-opacity-20 transition duration-200" onclick="toggleTheme()">
-        <i id="theme-icon" class="fas fa-moon text-gray-300 mr-3"></i>
-        <span id="theme-text">Tryb ciemny</span>
-      </button>
-      <!-- Przycisk wylogowania -->
-      <form th:action="@{/logout}" method="post" class="mt-4">
-        <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-md hover:bg-red-600 hover:bg-opacity-80 transition duration-200">
-          <i class="fas fa-sign-out-alt text-gray-300 mr-3"></i>
-          <span class="group-hover:text-white">Wyloguj się</span>
+
+      <!-- Sekcja z przyciskami na dole -->
+      <div class="space-y-2 pb-6">
+        <!-- Przycisk zmiany trybu -->
+        <button id="theme-toggle" class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg" onclick="toggleTheme()">
+          <i id="theme-icon" class="fas fa-moon text-gray-500 dark:text-gray-400 mr-2"></i>
+          <span id="theme-text">Tryb ciemny</span>
         </button>
-      </form>
+
+        <!-- Przycisk ustawienia -->
+        <a th:href="@{/settings}" class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <i class="fas fa-cog text-gray-500 dark:text-gray-400 mr-2"></i>
+          Ustawienia
+        </a>
+
+        <!-- Przycisk wylogowania -->
+        <form th:action="@{/logout}" method="post">
+          <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-red-500 dark:hover:bg-red-500">
+            <i class="fas fa-sign-out-alt text-gray-500 dark:text-gray-400 mr-2"></i>
+            Wyloguj się
+          </button>
+        </form>
+      </div>
     </div>
   </aside>
-  <!-- Nakładka mobilna -->
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 </div>
+</body>
+</html>

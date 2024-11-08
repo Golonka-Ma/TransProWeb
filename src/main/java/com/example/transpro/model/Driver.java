@@ -19,7 +19,6 @@ public class Driver {
     private Long id;
 
     private String firstName;
-
     private String lastName;
 
     @Column(unique = true, nullable = false)
@@ -45,4 +44,11 @@ public class Driver {
 
     @OneToMany(mappedBy = "driver")
     private List<Load> loads;
+
+    // Tymczasowe pola na sformatowane daty
+    @Transient
+    private String formattedLicenseExpiryDate;
+
+    @Transient
+    private String formattedTachoCardExpiryDate;
 }

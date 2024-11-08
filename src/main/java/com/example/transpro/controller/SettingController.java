@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
-public class HomeController {
+public class SettingController {
 
     @ModelAttribute("path")
     public String addServletPathToModel(HttpServletRequest request) {
         return request.getServletPath();
     }
-    @GetMapping("/home")
+    @GetMapping("/settings")
     public String home() {
-        return "user/home";
+        return "user/settings";
     }
 }
 
