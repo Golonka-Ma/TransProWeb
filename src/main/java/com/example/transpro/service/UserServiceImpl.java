@@ -28,11 +28,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Dodaj brakującą metodę
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    @Override
+    public List<User> findAll() {return userRepository.findAll();}
 
     @Override
     public User save(UserRegistrationDto registration) {

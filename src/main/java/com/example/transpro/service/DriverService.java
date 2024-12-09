@@ -1,9 +1,12 @@
 package com.example.transpro.service;
 
 import com.example.transpro.model.Driver;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import java.util.List;
 import java.util.Optional;
 
+//@MockBean
 public interface DriverService {
     List<Driver> findAllDrivers();
     void saveDriver(Driver driver);

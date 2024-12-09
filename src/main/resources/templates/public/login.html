@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pl" class="dark" >
+<html xmlns:th="http://www.thymeleaf.org" lang="pl" class="dark">
 <head>
     <meta charset="UTF-8">
     <title>Logowanie</title>
@@ -13,15 +13,14 @@
 <div class="min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full bg-white dark:bg-darkSecondary bg-opacity-90 dark:bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-xl rounded-xl px-10 py-8">
         <!-- Logo -->
-        <!-- Możesz dodać logo tutaj -->
         <div class="flex justify-center mb-6">
             <img src="/media/app/logo.png" alt="Logo firmy" style="height: 120px">
         </div>
         <!-- Nagłówek -->
         <h2 class="text-3xl font-extrabold text-center mb-2 text-gray-900 dark:text-white">Witamy z powrotem!</h2>
         <p class="text-center text-gray-700 dark:text-gray-300 mb-8">Zaloguj się do swojego konta</p>
-        <!-- Formularz -->
-        <form th:action="@{/login}" method="post" class="space-y-6">
+        <!-- Formularz bez th:action -->
+        <form id="loginForm" class="space-y-6">
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa użytkownika</label>
                 <div class="mt-1 relative">
@@ -45,7 +44,6 @@
                         <button type="button" onclick="togglePasswordVisibility()" class="focus:outline-none">
                             <!-- Ikona otwartego oka -->
                             <svg id="password-eye-open" class="h-5 w-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <!-- Kod SVG dla otwartego oka -->
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7S3.732 16.057 2.458 12z" />
                             </svg>
@@ -105,8 +103,35 @@
             passwordEyeClosed.classList.add('hidden');
         }
     }
-</script>
 
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username, password})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Niepoprawne dane logowania");
+                }
+                return response.json();
+            })
+            .then(data => {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', data.username);
+                window.location.href = "/home";
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    });
 </script>
 </body>
 </html>

@@ -62,14 +62,6 @@ public class DriverRestController {
             driver.setLicenseExpiryDate(updatedDriver.getLicenseExpiryDate());
             driver.setTachoCardNumber(updatedDriver.getTachoCardNumber());
             driver.setTachoCardExpiryDate(updatedDriver.getTachoCardExpiryDate());
-            if (driverService.existsByLicenseNumber(driver.getLicenseNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Kierowca o takim numerze licencji lub numerze tachografu już istnieje");
-            }
-            if (driverService.existsByTachoCardNumber(driver.getTachoCardNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Kierowca o takim numerze licencji lub numerze tachografu już istnieje");
-            }
             driverService.saveDriver(driver);
             return ResponseEntity.ok("Dane kierowcy zostały zaktualizowane");
         } else {
