@@ -83,7 +83,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("*")
+                        .allowedOrigins("http://localhost:8080","http://localhost:8083","exp://192.168.1.19:8083")
                         .allowedMethods("GET","POST","PUT","DELETE","OPTIONS");
             }
         };

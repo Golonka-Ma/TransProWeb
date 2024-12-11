@@ -161,13 +161,6 @@
             };
             stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
             document.getElementById('message').value = '';
-
-            showMessage({
-                content: messageContent,
-                sender: { username: currentUsername },
-                receiver: { username: selectedUser },
-                timestamp: new Date()
-            });
         }
     }
 
@@ -189,7 +182,7 @@
                 bubble.classList.add('message-bubble-receiver', 'mr-auto');
             }
 
-            bubble.textContent = message.sender.username + ': ' + message.content;
+            bubble.textContent = message.content;
             messageElement.appendChild(bubble);
             messageArea.appendChild(messageElement);
             messageArea.scrollTop = messageArea.scrollHeight;
