@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TransPro - Flota (Pojazdy)</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <!-- Ikony i czcionki -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+
+    <!-- DataTables + jQuery + SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+<!-- Pasek boczny -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<script th:src="@{/js/sidebar.js}"></script>
+
+<!-- Główna zawartość -->
+<div class="sm:ml-64 p-8">
+    <!-- Nagłówek strony -->
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Flota - Pojazdy</h1>
+    </header>
+
+    <!-- Sekcja powitalna -->
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Zarządzaj pojazdami</h2>
+        <p class="text-gray-700 dark:text-gray-300">
+            Tutaj możesz dodawać, edytować i usuwać pojazdy (np. TIR, bus, auto osobowe, itp.).
+        </p>
+    </section>
+
+    <!-- Sekcja - Tabela pojazdów -->
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Pojazdy</h2>
+            <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    onclick="openAddVehicleModal()">
+                <i class="fa fa-plus mr-2"></i>Dodaj Pojazd
+            </button>
+        </div>
+
+        <table id="vehiclesTable" class="display w-full">
+            <thead>
+            <tr>
+                <th>Nr rej.</th>
+                <th>Typ pojazdu</th>
+                <th>Typ naczepy</th>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Rok</th>
+                <th>VIN</th>
+                <th>Stan techn.</th>
+                <th>Akcje</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Dane będą ładowane dynamicznie przez JS -->
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<!-- MODAL: Dodaj Pojazd -->
+<div id="addVehicleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj nowy pojazd</h2>
+        <form id="addVehicleForm">
+            <!-- Registration Number -->
+            <div class="mb-4">
+                <label for="addRegistrationNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Numer rejestracyjny
+                </label>
+                <input type="text" id="addRegistrationNumber" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- VehicleType -->
+            <div class="mb-4">
+                <label for="addVehicleType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Typ pojazdu
+                </label>
+                <select id="addVehicleType"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="TIR">Ciągnik siodłowy (TIR)</option>
+                    <option value="BUS">Bus</option>
+                    <option value="PASSENGER_CAR">Samochód osobowy</option>
+                    <option value="VAN">Van</option>
+                    <option value="PICKUP">Pickup</option>
+                    <option value="TRAILER">Naczepa</option>
+                    <option value="OTHER">Inne</option>
+                </select>
+            </div>
+
+            <!-- TrailerType -->
+            <div class="mb-4">
+                <label for="addTrailerType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Typ naczepy
+                </label>
+                <select id="addTrailerType"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="">(Brak / Nie dotyczy)</option>
+                    <option value="PLANDEKA">Plandeka</option>
+                    <option value="CHLODIA">Chłodnia</option>
+                    <option value="IZOTERMA">Izoterma</option>
+                    <option value="WYWROTKA">Wywrotka</option>
+                    <option value="SAMOWYLADOWCZA">Samowyładowcza</option>
+                    <option value="PLATFORMA_NISKOPODWOZIOWA">Platforma niskopodwoziowa</option>
+                    <option value="PLATFORMA_PODKONTENEROWA">Platforma podkontenerowa</option>
+                    <option value="CYSTERNA">Cysterna</option>
+                    <option value="SILOS">Silos</option>
+                    <option value="HDS">HDS (z dźwigiem)</option>
+                    <option value="KLONICA">Kłonica</option>
+                    <option value="LAWETA">Laweta</option>
+                    <option value="ZYWIEC">Naczepa do żywca</option>
+                </select>
+            </div>
+
+            <!-- Brand -->
+            <div class="mb-4">
+                <label for="addBrand" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Marka
+                </label>
+                <input type="text" id="addBrand"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Model -->
+            <div class="mb-4">
+                <label for="addModel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Model
+                </label>
+                <input type="text" id="addModel"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Year -->
+            <div class="mb-4">
+                <label for="addYear" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Rok
+                </label>
+                <input type="number" id="addYear"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- VIN -->
+            <div class="mb-4">
+                <label for="addVin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    VIN
+                </label>
+                <input type="text" id="addVin"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Technical Condition -->
+            <div class="mb-4">
+                <label for="addTechnicalCondition" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Stan techniczny
+                </label>
+                <input type="text" id="addTechnicalCondition"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeAddVehicleModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    Zapisz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: Edytuj Pojazd -->
+<div id="editVehicleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Edytuj pojazd</h2>
+        <form id="editVehicleForm">
+            <!-- Registration Number -->
+            <div class="mb-4">
+                <label for="editRegistrationNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Numer rejestracyjny
+                </label>
+                <input type="text" id="editRegistrationNumber" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- VehicleType -->
+            <div class="mb-4">
+                <label for="editVehicleType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Typ pojazdu
+                </label>
+                <select id="editVehicleType"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="TIR">Ciągnik siodłowy (TIR)</option>
+                    <option value="BUS">Bus</option>
+                    <option value="PASSENGER_CAR">Samochód osobowy</option>
+                    <option value="VAN">Van</option>
+                    <option value="PICKUP">Pickup</option>
+                    <option value="TRAILER">Naczepa</option>
+                    <option value="OTHER">Inne</option>
+                </select>
+            </div>
+
+            <!-- TrailerType -->
+            <div class="mb-4">
+                <label for="editTrailerType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Typ naczepy
+                </label>
+                <select id="editTrailerType"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="">(Brak / Nie dotyczy)</option>
+                    <option value="PLANDEKA">Plandeka</option>
+                    <option value="CHLODIA">Chłodnia</option>
+                    <option value="IZOTERMA">Izoterma</option>
+                    <option value="WYWROTKA">Wywrotka</option>
+                    <option value="SAMOWYLADOWCZA">Samowyładowcza</option>
+                    <option value="PLATFORMA_NISKOPODWOZIOWA">Platforma niskopodwoziowa</option>
+                    <option value="PLATFORMA_PODKONTENEROWA">Platforma podkontenerowa</option>
+                    <option value="CYSTERNA">Cysterna</option>
+                    <option value="SILOS">Silos</option>
+                    <option value="HDS">HDS (z dźwigiem)</option>
+                    <option value="KLONICA">Kłonica</option>
+                    <option value="LAWETA">Laweta</option>
+                    <option value="ZYWIEC">Naczepa do żywca</option>
+                </select>
+            </div>
+
+            <!-- Brand -->
+            <div class="mb-4">
+                <label for="editBrand" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Marka
+                </label>
+                <input type="text" id="editBrand"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Model -->
+            <div class="mb-4">
+                <label for="editModel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Model
+                </label>
+                <input type="text" id="editModel"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Year -->
+            <div class="mb-4">
+                <label for="editYear" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Rok
+                </label>
+                <input type="number" id="editYear"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- VIN -->
+            <div class="mb-4">
+                <label for="editVin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    VIN
+                </label>
+                <input type="text" id="editVin"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Technical Condition -->
+            <div class="mb-4">
+                <label for="editTechnicalCondition" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Stan techniczny
+                </label>
+                <input type="text" id="editTechnicalCondition"
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+
+            <!-- Hidden Vehicle ID -->
+            <input type="hidden" id="editVehicleId" />
+
+            <div class="flex justify-end">
+                <button type="button"
+                        class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeEditVehicleModal()">Anuluj</button>
+                <button type="submit"
+                        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /* <![CDATA[ */
+    let vehiclesTable;
+
+    // Initialize DataTable
+    $(document).ready(function () {
+        vehiclesTable = $('#vehiclesTable').DataTable({
+            "ajax": {
+                "url": "/api/vehicles",
+                "headers": {
+                    'Authorization': 'transprokey'
+                },
+                // Filter out any vehicle where vehicleType === 'TRAILER'
+                "dataSrc": function(json) {
+                    // Return only those that are NOT "TRAILER"
+                    return json.filter(item => item.vehicleType !== 'TRAILER');
+                },
+                "error": function () {
+                    Swal.fire('Błąd!', 'Nie udało się pobrać danych pojazdów.', 'error');
+                }
+            },
+            "columns": [
+                { "data": "registrationNumber" },
+                {
+                    "data": "vehicleType",
+                    "render": function(data, type, row) {
+                        if (data === "TIR") {
+                            return "Ciągnik sidłowy (TIR)";
+                        }
+                        // Fallback if it's not TRAILER for some reason
+                        return data;
+                    }
+                },
+                {
+                    "data": "trailerType",
+                    "render": function(data) {
+                        return data ? data : "(Brak / nie dotyczy)";
+                    }
+                },
+                { "data": "brand" },
+                { "data": "model" },
+                { "data": "year" },
+                { "data": "vin" },
+                { "data": "technicalCondition" },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return `
+                        <button class="bg-yellow-500 text-white px-2 py-1 rounded" onclick="editVehicle(${row.id})">
+                            Edytuj
+                        </button>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="deleteVehicle(${row.id})">
+                            Usuń
+                        </button>
+                    `;
+                    }
+                }
+            ],
+            "language": {
+                "processing": "Przetwarzanie...",
+                "search": "Szukaj:",
+                "lengthMenu": "Pokaż _MENU_ pozycji",
+                "info": "Pozycje od _START_ do _END_ z _TOTAL_ łącznie",
+                "infoEmpty": "Pozycji 0 z 0 dostępnych",
+                "infoFiltered": "(filtrowanie spośród _MAX_ dostępnych pozycji)",
+                "loadingRecords": "Wczytywanie...",
+                "zeroRecords": "Nie znaleziono pasujących pozycji",
+                "emptyTable": "Brak danych",
+                "paginate": {
+                    "first": "Pierwsza",
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                    "last": "Ostatnia"
+                },
+                "buttons": {
+                    "copy": "Kopiuj"
+                },
+                "aria": {
+                    "sortAscending": ": aktywuj, by posortować kolumnę rosnąco",
+                    "sortDescending": ": aktywuj, by posortować kolumnę malejąco"
+                }
+            }
+        });
+    });
+
+    // --- MODAL HANDLERS ---
+    function openAddVehicleModal() {
+        $('#addVehicleModal').removeClass('hidden').addClass('flex');
+    }
+    function closeAddVehicleModal() {
+        $('#addVehicleModal').addClass('hidden').removeClass('flex');
+        $('#addVehicleForm')[0].reset();
+    }
+
+    function openEditVehicleModal() {
+        $('#editVehicleModal').removeClass('hidden').addClass('flex');
+    }
+    function closeEditVehicleModal() {
+        $('#editVehicleModal').addClass('hidden').removeClass('flex');
+        $('#editVehicleForm')[0].reset();
+    }
+
+    // --- ADD VEHICLE ---
+    $('#addVehicleForm').on('submit', function(e) {
+        e.preventDefault();
+        const newVehicleData = {
+            registrationNumber: $('#addRegistrationNumber').val(),
+            vehicleType: $('#addVehicleType').val() || null,
+            trailerType: $('#addTrailerType').val() || null,
+            brand: $('#addBrand').val(),
+            model: $('#addModel').val(),
+            year: $('#addYear').val(),
+            vin: $('#addVin').val(),
+            technicalCondition: $('#addTechnicalCondition').val()
+        };
+
+        $.ajax({
+            url: '/api/vehicles/add',
+            type: 'POST',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(newVehicleData),
+            success: function(response) {
+                Swal.fire('Sukces', response, 'success');
+                closeAddVehicleModal();
+                vehiclesTable.ajax.reload();
+            },
+            error: function(xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się dodać pojazdu.', 'error');
+            }
+        });
+    });
+
+    // --- EDIT VEHICLE ---
+    function editVehicle(vehicleId) {
+        $.ajax({
+            url: `/api/vehicles/${vehicleId}`,
+            type: 'GET',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            success: function(vehicle) {
+                // Fill edit form
+                $('#editVehicleId').val(vehicle.id);
+                $('#editRegistrationNumber').val(vehicle.registrationNumber || '');
+                $('#editVehicleType').val(vehicle.vehicleType || '');
+                $('#editTrailerType').val(vehicle.trailerType || '');
+                $('#editBrand').val(vehicle.brand || '');
+                $('#editModel').val(vehicle.model || '');
+                $('#editYear').val(vehicle.year || '');
+                $('#editVin').val(vehicle.vin || '');
+                $('#editTechnicalCondition').val(vehicle.technicalCondition || '');
+
+                openEditVehicleModal();
+            },
+            error: function() {
+                Swal.fire('Błąd!', 'Nie udało się pobrać danych pojazdu.', 'error');
+            }
+        });
+    }
+
+    $('#editVehicleForm').on('submit', function(e) {
+        e.preventDefault();
+        const vehicleId = $('#editVehicleId').val();
+        const updatedVehicleData = {
+            registrationNumber: $('#editRegistrationNumber').val(),
+            vehicleType: $('#editVehicleType').val() || null,
+            trailerType: $('#editTrailerType').val() || null,
+            brand: $('#editBrand').val(),
+            model: $('#editModel').val(),
+            year: $('#editYear').val(),
+            vin: $('#editVin').val(),
+            technicalCondition: $('#editTechnicalCondition').val()
+        };
+
+        $.ajax({
+            url: `/api/vehicles/edit/${vehicleId}`,
+            type: 'PUT',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            contentType: 'application/json',
+            data: JSON.stringify(updatedVehicleData),
+            success: function(response) {
+                Swal.fire('Sukces', response, 'success');
+                closeEditVehicleModal();
+                vehiclesTable.ajax.reload();
+            },
+            error: function(xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się zaktualizować pojazdu.', 'error');
+            }
+        });
+    });
+
+    // --- DELETE VEHICLE ---
+    function deleteVehicle(vehicleId) {
+        Swal.fire({
+            title: 'Jesteś pewien?',
+            text: "Nie będziesz mógł tego cofnąć!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Tak, usuń to!',
+            cancelButtonText: 'Anuluj'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/api/vehicles/delete/${vehicleId}`,
+                    type: 'DELETE',
+                    headers: {
+                        'Authorization': 'transprokey'
+                    },
+                    success: function(response) {
+                        Swal.fire('Usunięto!', response, 'success');
+                        vehiclesTable.ajax.reload();
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Błąd!', xhr.responseText || 'Nie udało się usunąć pojazdu.', 'error');
+                    }
+                });
+            }
+        });
+    }
+    /* ]]> */
+</script>
+</body>
+</html>

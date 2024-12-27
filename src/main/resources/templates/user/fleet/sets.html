@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TransPro - Zestawy (Truck + Trailer)</title>
+    <!-- DataTables / jQuery / SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Your custom CSS (Tailwind or otherwise) -->
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+<!-- Optional: Sidebar fragment -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<script th:src="@{/js/sidebar.js}"></script>
+
+<div class="sm:ml-64 p-8">
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Zestawy (Truck + Trailer)</h1>
+        <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="openAddSetModal()">
+            <i class="fa fa-plus mr-2"></i>Dodaj Zestaw
+        </button>
+    </header>
+
+    <!-- Table Section -->
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <table id="setsTable" class="display w-full">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ciężarówka</th>
+                <th>Naczepa</th>
+                <th>Kierowca</th>
+                <th>Akcje</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Data populated dynamically -->
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<!-- ADD SET MODAL -->
+<div id="addSetModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Zestaw</h2>
+        <form id="addSetForm">
+            <!-- Truck -->
+            <div class="mb-4">
+                <label for="addTruckId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Ciężarówka
+                </label>
+                <select id="addTruckId" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <!-- Options dynamically loaded from /api/vehicles?type=TRUCK -->
+                </select>
+            </div>
+
+            <!-- Trailer -->
+            <div class="mb-4">
+                <label for="addTrailerId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Naczepa
+                </label>
+                <select id="addTrailerId" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <!-- Options dynamically loaded from /api/vehicles?type=TRAILER -->
+                </select>
+            </div>
+
+            <!-- Driver (optional) -->
+            <div class="mb-4">
+                <label for="addDriverId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kierowca (opcjonalnie)
+                </label>
+                <select id="addDriverId"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <!-- Options dynamically loaded from /api/drivers -->
+                </select>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeAddSetModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- EDIT SET MODAL -->
+<div id="editSetModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Edytuj Zestaw</h2>
+        <form id="editSetForm">
+            <!-- Hidden field for Set ID -->
+            <input type="hidden" id="editSetId">
+
+            <!-- Truck -->
+            <div class="mb-4">
+                <label for="editTruckId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Ciężarówka
+                </label>
+                <select id="editTruckId" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </select>
+            </div>
+
+            <!-- Trailer -->
+            <div class="mb-4">
+                <label for="editTrailerId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Naczepa
+                </label>
+                <select id="editTrailerId" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </select>
+            </div>
+
+            <!-- Driver -->
+            <div class="mb-4">
+                <label for="editDriverId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kierowca (opcjonalnie)
+                </label>
+                <select id="editDriverId"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </select>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeEditSetModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------------
+    // DataTables Initialization
+    // ---------------------------------------
+    $(document).ready(function () {
+        $('#setsTable').DataTable({
+            "ajax": {
+                "url": "/api/vehicle-sets",   // Adjust endpoint if needed
+                "headers": {
+                    'Authorization': 'transprokey' // If you're using a token
+                },
+                "dataSrc": "",
+                "error": function () {
+                    Swal.fire('Błąd!', 'Nie udało się pobrać danych zestawów.', 'error');
+                }
+            },
+            "columns": [
+                { "data": "id" },
+                {
+                    "data": "truck.registrationNumber",
+                    "defaultContent": "Brak ciężarówki"
+                },
+                {
+                    "data": "trailer.registrationNumber",
+                    "defaultContent": "Brak naczepy"
+                },
+                {
+                    "data": "driver.lastName",
+                    "defaultContent": "Brak kierowcy"
+                },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return `
+                            <button class="bg-yellow-500 text-white px-2 py-1 rounded" onclick="editSet(${row.id})">
+                                Edytuj
+                            </button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded" onclick="deleteSet(${row.id})">
+                                Usuń
+                            </button>
+                        `;
+                    }
+                }
+            ],
+            "language": {
+                "processing": "Przetwarzanie...",
+                "search": "Szukaj:",
+                "lengthMenu": "Pokaż _MENU_ pozycji",
+                "info": "Pozycje od _START_ do _END_ z _TOTAL_ łącznie",
+                "infoEmpty": "Pozycji 0 z 0 dostępnych",
+                "infoFiltered": "(filtrowanie spośród _MAX_ dostępnych pozycji)",
+                "loadingRecords": "Wczytywanie...",
+                "zeroRecords": "Nie znaleziono pasujących pozycji",
+                "emptyTable": "Brak danych",
+                "paginate": {
+                    "first": "Pierwsza",
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                    "last": "Ostatnia"
+                },
+                "buttons": {
+                    "copy": "Kopiuj"
+                },
+                "aria": {
+                    "sortAscending": ": aktywuj, by posortować kolumnę rosnąco",
+                    "sortDescending": ": aktywuj, by posortować kolumnę malejąco"
+                }
+            }
+        });
+
+        // Preload truck, trailer, and driver options for the Add and Edit forms
+        preloadVehiclesAndDrivers();
+    });
+
+    // ---------------------------------------
+    // Modal Functions
+    // ---------------------------------------
+    function openAddSetModal() {
+        $('#addSetModal').removeClass('hidden').addClass('flex');
+    }
+
+    function closeAddSetModal() {
+        $('#addSetModal').addClass('hidden').removeClass('flex');
+        $('#addSetForm')[0].reset();
+    }
+
+    function openEditSetModal() {
+        $('#editSetModal').removeClass('hidden').addClass('flex');
+    }
+
+    function closeEditSetModal() {
+        $('#editSetModal').addClass('hidden').removeClass('flex');
+        $('#editSetForm')[0].reset();
+    }
+
+    // ---------------------------------------
+    // Preload Vehicles & Drivers for the SELECT boxes
+    // ---------------------------------------
+    function preloadVehiclesAndDrivers() {
+        // Example: load trucks
+        $.ajax({
+            url: '/api/vehicles?type=TRUCK',  // Adjust if you have a query param approach
+            method: 'GET',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            success: function (trucks) {
+                populateSelect('addTruckId', trucks);
+                populateSelect('editTruckId', trucks);
+            }
+        });
+
+        // Example: load trailers
+        $.ajax({
+            url: '/api/vehicles?type=TRAILER',
+            method: 'GET',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            success: function (trailers) {
+                populateSelect('addTrailerId', trailers);
+                populateSelect('editTrailerId', trailers);
+            }
+        });
+
+        // Example: load drivers
+        $.ajax({
+            url: '/api/drivers',
+            method: 'GET',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            success: function (drivers) {
+                populateSelect('addDriverId', drivers, true);
+                populateSelect('editDriverId', drivers, true);
+            }
+        });
+    }
+
+    // Utility function to populate <select> from an array of data
+    // For vehicles, use registrationNumber; for drivers, use lastName + firstName
+    function populateSelect(selectId, items, isDriver = false) {
+        const selectElem = document.getElementById(selectId);
+        // Clear existing
+        selectElem.innerHTML = '<option value="">-- Wybierz --</option>';
+
+        items.forEach(item => {
+            let label, value;
+            if (isDriver) {
+                label = (item.lastName || '') + ' ' + (item.firstName || '');
+                value = item.id;
+            } else {
+                label = item.registrationNumber || 'Brak rejestracji';
+                value = item.id;
+            }
+
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label.trim();
+            selectElem.appendChild(option);
+        });
+    }
+
+    // ---------------------------------------
+    // ADD SET SUBMIT
+    // ---------------------------------------
+    $('#addSetForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const setData = {
+            truckId: $('#addTruckId').val(),
+            trailerId: $('#addTrailerId').val(),
+            driverId: $('#addDriverId').val() || null
+        };
+
+        $.ajax({
+            url: '/api/vehicle-sets',
+            type: 'POST',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            // If your controller uses @RequestParam, send as form data
+            // If it uses @RequestBody, do JSON.stringify + contentType = 'application/json'
+            data: setData,
+            success: function () {
+                Swal.fire('Sukces!', 'Dodano nowy zestaw.', 'success');
+                closeAddSetModal();
+                $('#setsTable').DataTable().ajax.reload();
+            },
+            error: function (xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się dodać zestawu.', 'error');
+            }
+        });
+    });
+
+    // ---------------------------------------
+    // EDIT/GET SET
+    // ---------------------------------------
+    function editSet(setId) {
+        $.ajax({
+            url: `/api/vehicle-sets/${setId}`,
+            method: 'GET',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            success: function (set) {
+                if (set) {
+                    // Fill the Edit form
+                    $('#editSetId').val(set.id);
+                    $('#editTruckId').val(set.truck ? set.truck.id : '');
+                    $('#editTrailerId').val(set.trailer ? set.trailer.id : '');
+                    $('#editDriverId').val(set.driver ? set.driver.id : '');
+
+                    openEditSetModal();
+                } else {
+                    Swal.fire('Błąd!', 'Nie znaleziono zestawu.', 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('Błąd!', 'Nie udało się pobrać danych zestawu.', 'error');
+            }
+        });
+    }
+
+    // ---------------------------------------
+    // EDIT SET SUBMIT
+    // ---------------------------------------
+    $('#editSetForm').on('submit', function (e) {
+        e.preventDefault();
+        const setId = $('#editSetId').val();
+        const updateData = {
+            truckId: $('#editTruckId').val(),
+            trailerId: $('#editTrailerId').val(),
+            driverId: $('#editDriverId').val() || null
+        };
+
+        $.ajax({
+            url: `/api/vehicle-sets/${setId}`,
+            type: 'PUT',
+            headers: {
+                'Authorization': 'transprokey'
+            },
+            data: updateData,
+            success: function () {
+                Swal.fire('Sukces!', 'Zestaw został zaktualizowany.', 'success');
+                closeEditSetModal();
+                $('#setsTable').DataTable().ajax.reload();
+            },
+            error: function (xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się zaktualizować zestawu.', 'error');
+            }
+        });
+    });
+
+    // ---------------------------------------
+    // DELETE SET
+    // ---------------------------------------
+    function deleteSet(setId) {
+        Swal.fire({
+            title: 'Jesteś pewien?',
+            text: "Nie będziesz mógł tego cofnąć!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Tak, usuń to!',
+            cancelButtonText: 'Anuluj'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/api/vehicle-sets/${setId}`,
+                    type: 'DELETE',
+                    headers: {
+                        'Authorization': 'transprokey'
+                    },
+                    success: function () {
+                        Swal.fire('Usunięto!', 'Zestaw został usunięty.', 'success');
+                        $('#setsTable').DataTable().ajax.reload();
+                    },
+                    error: function () {
+                        Swal.fire('Błąd!', 'Nie udało się usunąć zestawu.', 'error');
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
