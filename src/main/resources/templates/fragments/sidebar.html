@@ -15,7 +15,7 @@
          aria-label="Sidebar">
     <div class="h-full flex flex-col justify-between px-3 pb-4 overflow-y-auto bg-gray-100 dark:bg-gray-800">
       <!-- Logo i nazwa aplikacji -->
-      <div class="flex flex-col items-center pt-4">
+      <div class="flex flex-col items-center pt-4 cursor-pointer" onclick="window.location.href = '/home'">
         <img src="/media/app/logo.png" alt="Logo firmy" class="h-16 mb-2">
         <span class="text-2xl font-semibold text-gray-900 dark:text-white">
           Trans<span class="text-2xl font-semibold dark:text-red-900">Pro</span>
@@ -65,15 +65,15 @@
                 Kierowcy
               </a>
             </li>
-            <li th:classappend="${path == '/timeofwork'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-              <a th:href="@{/timeofwork}"
+            <li th:classappend="${path == 'drivers/timeofwork'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/drivers/timeofwork}"
                  class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
                 <i class="fas fa-clock text-gray-500 dark:text-gray-400 mr-2"></i>
                 Czas pracy
               </a>
             </li>
-            <li th:classappend="${path == '/grafikofdrivers'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-              <a th:href="@{/grafikofdrivers}"
+            <li th:classappend="${path == 'drivers/schedule'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/drivers/schedule}"
                  class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
                 <i class="fas fa-calendar-alt text-gray-500 dark:text-gray-400 mr-2"></i>
                 Grafik

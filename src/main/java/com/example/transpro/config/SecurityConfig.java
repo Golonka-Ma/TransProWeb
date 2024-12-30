@@ -56,6 +56,9 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((req, res, ex) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
                 )
+                .sessionManagement((session) -> session
+                        .invalidSessionUrl("/login?session=expired")
+                )
                 .cors(); // Włącz CORS
 
         return http.build();

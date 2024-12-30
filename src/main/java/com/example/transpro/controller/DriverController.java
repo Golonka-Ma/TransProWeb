@@ -15,8 +15,13 @@ public class DriverController {
     public String addServletPathToModel(HttpServletRequest request) {
         return request.getServletPath();
     }
+
     @GetMapping
-    public String showDriversPage(Model model) {
-        return "user/drivers"; // Path to drivers.html
-    }
+    public String driverHome() {return "user/driver/drivers";}
+
+    @GetMapping("/timeofwork")
+    public String timeOfWork() {return "user/driver/timeofwork";}
+
+    @GetMapping("/schedule")
+    public String schedule() {return "user/driver/schedule";}
 }

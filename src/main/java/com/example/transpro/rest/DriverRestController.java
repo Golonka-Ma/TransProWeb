@@ -34,7 +34,6 @@ public class DriverRestController {
     }
 
 
-
     @PostMapping("/add")
     public ResponseEntity<String> addDriver(@RequestBody Driver driver) {
         if (driverService.existsByLicenseNumber(driver.getLicenseNumber())) {
@@ -60,8 +59,14 @@ public class DriverRestController {
             driver.setLastName(updatedDriver.getLastName());
             driver.setLicenseNumber(updatedDriver.getLicenseNumber());
             driver.setLicenseExpiryDate(updatedDriver.getLicenseExpiryDate());
+            driver.setDriverLicenceNumber(updatedDriver.getDriverLicenceNumber());
+            driver.setDriverLicenceExpiryDate(updatedDriver.getDriverLicenceExpiryDate());
             driver.setTachoCardNumber(updatedDriver.getTachoCardNumber());
             driver.setTachoCardExpiryDate(updatedDriver.getTachoCardExpiryDate());
+            driver.setCategories(updatedDriver.getCategories());
+            driver.setPoints(updatedDriver.getPoints());
+            driver.setAccidentsCount(updatedDriver.getAccidentsCount());
+            driver.setRestrictions(updatedDriver.getRestrictions());
             driverService.saveDriver(driver);
             return ResponseEntity.ok("Dane kierowcy zostały zaktualizowane");
         } else {

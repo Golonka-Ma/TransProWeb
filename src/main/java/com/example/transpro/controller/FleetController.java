@@ -10,16 +10,10 @@ import org.springframework.web.bind.annotation.*;
 public class FleetController {
 
     @ModelAttribute("path")
-    public String addServletPathToModel(HttpServletRequest request) {
-        return request.getServletPath();
-    }
+    public String addServletPathToModel(HttpServletRequest request) {return request.getServletPath();}
 
     @GetMapping
-    public String fleetHome() {
-        // Perhaps return a general fleet overview page if needed
-        return "user/fleet/fleet";
-        // Or redirect to /fleet/vehicles
-    }
+    public String fleetHome() {return "user/fleet/fleet";}
 
     @GetMapping("/vehicles")
     public String vehiclesPage() {
