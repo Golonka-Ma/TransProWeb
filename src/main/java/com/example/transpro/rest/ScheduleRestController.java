@@ -9,17 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
 import java.time.LocalDate;
+import java.util.*;
 
-/**
- * Exposes endpoints for schedules:
- *  GET /api/schedules         -> fetch all schedules
- *  POST /api/schedules        -> add a normal "WORK" schedule
- *  POST /api/vacations        -> add a "VACATION" schedule
- *  PUT  /api/schedules/{id}   -> edit an existing schedule
- *  DELETE /api/schedules/{id} -> delete a schedule
- */
 @RestController
 @RequestMapping("/api")
 public class ScheduleRestController {
@@ -33,11 +25,11 @@ public class ScheduleRestController {
         this.driverService = driverService;
     }
 
+    // --------------------------------------------------
     // 1) GET all schedules (both WORK and VACATION)
+    // --------------------------------------------------
     @GetMapping("/schedules")
     public List<Map<String, Object>> getAllSchedules() {
-        // We return a JSON list that FullCalendar can use:
-        // [ { "id": ..., "driverName": ..., "startDate": "yyyy-MM-dd", "endDate": "yyyy-MM-dd", "color": "#...." }, ... ]
         List<Schedule> schedules = scheduleService.findAll();
         List<Map<String, Object>> response = new ArrayList<>();
 
@@ -55,47 +47,45 @@ public class ScheduleRestController {
         return response;
     }
 
-    // 2) POST /api/schedules => add a normal "WORK" schedule
+    // --------------------------------------------------
+    // 2) POST /api/schedules => add WORK or VACATION
+    // --------------------------------------------------
     @PostMapping("/schedules")
-    public ResponseEntity<String> addWorkSchedule(@RequestBody ScheduleRequest req) {
+    public ResponseEntity<String> addSchedule(@RequestBody ScheduleRequest req) {
+        // Validate driver
         Optional<Driver> driverOpt = driverService.findDriverById(req.getDriverId());
         if (driverOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Driver not found for ID: " + req.getDriverId());
         }
 
+        // Basic date validation
+        if (req.getStartDate() == null || req.getEndDate() == null) {
+            return ResponseEntity.badRequest().body("Start date and end date cannot be null.");
+        }
+        if (req.getEndDate().isBefore(req.getStartDate())) {
+            return ResponseEntity.badRequest().body("End date cannot be before start date.");
+        }
+
+        // Create new schedule
         Schedule schedule = new Schedule();
         schedule.setDriver(driverOpt.get());
         schedule.setStartDate(req.getStartDate());
         schedule.setEndDate(req.getEndDate());
-        schedule.setColor(req.getColor());
-        schedule.setType(ScheduleType.WORK);
+        schedule.setColor(req.getColor() != null ? req.getColor() :
+                (req.getType() == ScheduleType.VACATION ? "#ff6600" : "#33cc33")); // default colors
+        schedule.setType(req.getType() != null ? req.getType() : ScheduleType.WORK);
 
         scheduleService.save(schedule);
-        return ResponseEntity.ok("Grafik pracy został dodany");
+
+        // Return a more descriptive success message
+        return schedule.getType() == ScheduleType.WORK
+                ? ResponseEntity.ok("Grafik pracy został dodany.")
+                : ResponseEntity.ok("Urlop został dodany.");
     }
 
-    // 3) POST /api/vacations => add a "VACATION"
-    @PostMapping("/vacations")
-    public ResponseEntity<String> addVacation(@RequestBody ScheduleRequest req) {
-        Optional<Driver> driverOpt = driverService.findDriverById(req.getDriverId());
-        if (driverOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Driver not found for ID: " + req.getDriverId());
-        }
-
-        // Possibly check for conflicts or cargo, etc.
-
-        Schedule vacation = new Schedule();
-        vacation.setDriver(driverOpt.get());
-        vacation.setStartDate(req.getStartDate());
-        vacation.setEndDate(req.getEndDate());
-        vacation.setColor(req.getColor());
-        vacation.setType(ScheduleType.VACATION);
-
-        scheduleService.save(vacation);
-        return ResponseEntity.ok("Urlop został dodany");
-    }
-
-    // 4) PUT /api/schedules/{id} => edit an existing schedule/vacation
+    // --------------------------------------------------
+    // 3) PUT /api/schedules/{id} => edit schedule
+    // --------------------------------------------------
     @PutMapping("/schedules/{id}")
     public ResponseEntity<String> editSchedule(@PathVariable Long id, @RequestBody ScheduleRequest req) {
         Optional<Schedule> existingOpt = scheduleService.findById(id);
@@ -113,20 +103,32 @@ public class ScheduleRestController {
             existing.setDriver(driverOpt.get());
         }
 
-        // Update dates, color
+        // Validate dates
+        if (req.getStartDate() == null || req.getEndDate() == null) {
+            return ResponseEntity.badRequest().body("Start date and end date cannot be null.");
+        }
+        if (req.getEndDate().isBefore(req.getStartDate())) {
+            return ResponseEntity.badRequest().body("End date cannot be before start date.");
+        }
+
+        // Update fields
         existing.setStartDate(req.getStartDate());
         existing.setEndDate(req.getEndDate());
-        existing.setColor(req.getColor() != null ? req.getColor() : existing.getColor());
-        // Keep the same type or let user specify
+
+        if (req.getColor() != null) {
+            existing.setColor(req.getColor());
+        }
         if (req.getType() != null) {
             existing.setType(req.getType());
         }
 
         scheduleService.save(existing);
-        return ResponseEntity.ok("Zaktualizowano grafik lub urlop");
+        return ResponseEntity.ok("Zaktualizowano grafik lub urlop.");
     }
 
-    // 5) DELETE /api/schedules/{id}
+    // --------------------------------------------------
+    // 4) DELETE /api/schedules/{id}
+    // --------------------------------------------------
     @DeleteMapping("/schedules/{id}")
     public ResponseEntity<String> deleteSchedule(@PathVariable Long id) {
         Optional<Schedule> s = scheduleService.findById(id);
@@ -138,7 +140,9 @@ public class ScheduleRestController {
         }
     }
 
+    // --------------------------------------------------
     // DTO for requests
+    // --------------------------------------------------
     public static class ScheduleRequest {
         private Long driverId;
         private LocalDate startDate;

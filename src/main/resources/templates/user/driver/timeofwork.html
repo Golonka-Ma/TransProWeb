@@ -1,10 +1,447 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <title>TransPro - Czas Pracy Kierowców</title>
 
+    <!-- DataTables + jQuery + SweetAlert2 + Tailwind (podobnie jak w widoku Kierowców) -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind lub Twój custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+<!-- Sidebar, theme toggling, itp. -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<script th:src="@{/js/sidebar.js}"></script>
+
+<div class="sm:ml-64 p-8">
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Czas Pracy Kierowców</h1>
+        <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="openAddModal()">
+            <i class="fa fa-plus mr-2"></i>Dodaj nowy wpis
+        </button>
+    </header>
+
+    <!-- Tabela WorkTime -->
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <table id="worktimeTable" class="display w-full">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Kierowca</th>
+                <th>Data</th>
+                <th>Jazda (min)</th>
+                <th>Przerwa (min)</th>
+                <th>Inna praca (min)</th>
+                <th>Odpoczynek (min)</th>
+                <th>Akcje</th>
+            </tr>
+            </thead>
+            <tbody><!-- Generowane przez DataTables --></tbody>
+        </table>
+    </section>
+</div>
+
+<!-- MODAL: Dodaj WorkTime -->
+<div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj czas pracy</h2>
+        <form id="addForm">
+            <!-- Wybór kierowcy z listy -->
+            <div class="mb-4">
+                <label for="addDriverSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kierowca
+                </label>
+                <select id="addDriverSelect" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <!-- Opcje generowane dynamicznie w preloadDrivers() -->
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="addDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
+                <input type="date" id="addDate" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="addDriving" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Jazda (min)
+                    </label>
+                    <input type="number" id="addDriving" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="addBreak" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Przerwa (min)
+                    </label>
+                    <input type="number" id="addBreak" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="addOther" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Inna praca (min)
+                    </label>
+                    <input type="number" id="addOther" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="addRest" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Odpoczynek (min)
+                    </label>
+                    <input type="number" id="addRest" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeAddModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: Edycja WorkTime -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Edytuj czas pracy</h2>
+        <form id="editForm">
+            <!-- Przechowujemy ID rekordu w hidden input -->
+            <input type="hidden" id="editId" />
+
+            <!-- Select kierowcy też wybierany z listy -->
+            <div class="mb-4">
+                <label for="editDriverSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kierowca
+                </label>
+                <select id="editDriverSelect"
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <!-- Opcje również generowane w preloadDrivers() -->
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="editDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
+                <input type="date" id="editDate" required
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="editDriving" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Jazda (min)
+                    </label>
+                    <input type="number" id="editDriving" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="editBreak" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Przerwa (min)
+                    </label>
+                    <input type="number" id="editBreak" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="editOther" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Inna praca (min)
+                    </label>
+                    <input type="number" id="editOther" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="editRest" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Odpoczynek (min)
+                    </label>
+                    <input type="number" id="editRest" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeEditModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Zapisz</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let worktimeTable;
+    let worktimeData = [];
+    let driversList = [];
+
+    // ----------------------------------
+    // Inicjalizacja
+    // ----------------------------------
+    $(document).ready(function () {
+        preloadDrivers(function() {
+            initWorkTimeTable();
+        });
+
+        // Obsługa tworzenia (Add)
+        $('#addForm').on('submit', function (e) {
+            e.preventDefault();
+            createWorkTime();
+        });
+
+        // Obsługa edycji (Edit)
+        $('#editForm').on('submit', function (e) {
+            e.preventDefault();
+            updateWorkTime();
+        });
+    });
+
+    // ----------------------------------
+    // 0) Pobranie kierowców, wypełnienie selectów
+    // ----------------------------------
+    function preloadDrivers(callback) {
+        $.ajax({
+            url: '/api/drivers',
+            method: 'GET',
+            headers: { 'Authorization': 'transprokey' },
+            success: function(drivers) {
+                driversList = drivers || [];
+                // Wypełnij <select> w modalu "add"
+                let addSel = $('#addDriverSelect');
+                addSel.empty();
+                addSel.append(`<option value="">--Wybierz kierowcę--</option>`);
+                driversList.forEach(d => {
+                    addSel.append(`<option value="${d.id}">${d.firstName} ${d.lastName}</option>`);
+                });
+
+                // Wypełnij <select> w modalu "edit"
+                let editSel = $('#editDriverSelect');
+                editSel.empty();
+                editSel.append(`<option value="">--Wybierz kierowcę--</option>`);
+                driversList.forEach(d => {
+                    editSel.append(`<option value="${d.id}">${d.firstName} ${d.lastName}</option>`);
+                });
+
+                if (callback) callback();
+            },
+            error: function() {
+                console.error("Nie udało się pobrać kierowców.");
+                if (callback) callback(); // Mimo błędu można wywołać init
+            }
+        });
+    }
+
+    // ----------------------------------
+    // 1) Inicjalizacja tabeli WorkTime
+    // ----------------------------------
+    function initWorkTimeTable() {
+        worktimeTable = $('#worktimeTable').DataTable({
+            "ajax": {
+                "url": "/api/worktime",
+                "headers": { 'Authorization': 'transprokey' },
+                "dataSrc": "",
+                "error": function (xhr) {
+                    Swal.fire('Błąd!', 'Nie udało się pobrać danych czasu pracy.', 'error');
+                }
+            },
+            "columns": [
+                { "data": "id" },
+                {
+                    // Zamiast driver.id – driver.firstName + ' ' + driver.lastName
+                    "data": null,
+                    "render": function(data, type, row) {
+                        if (row.driver) {
+                            return `${row.driver.firstName || ''} ${row.driver.lastName || ''}`;
+                        } else {
+                            return '-';
+                        }
+                    }
+                },
+                { "data": "date" },
+                { "data": "drivingMinutes" },
+                { "data": "breakMinutes" },
+                { "data": "otherWorkMinutes" },
+                { "data": "restMinutes" },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return `
+                            <button class="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+                                    onclick="openEditModalData(${row.id})">
+                                Edytuj
+                            </button>
+                            <button class="bg-red-500 text-white px-2 py-1 rounded"
+                                    onclick="deleteWorkTime(${row.id})">
+                                Usuń
+                            </button>
+                        `;
+                    }
+                }
+            ],
+            "language": {
+                "processing": "Przetwarzanie...",
+                "search": "Szukaj:",
+                "lengthMenu": "Pokaż _MENU_ pozycji",
+                "info": "Pozycje od _START_ do _END_ z _TOTAL_ łącznie",
+                "infoEmpty": "Pozycji 0 z 0 dostępnych",
+                "infoFiltered": "(filtrowanie spośród _MAX_ dostępnych pozycji)",
+                "loadingRecords": "Wczytywanie...",
+                "zeroRecords": "Nie znaleziono pasujących pozycji",
+                "emptyTable": "Brak danych",
+                "paginate": {
+                    "first": "Pierwsza",
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                    "last": "Ostatnia"
+                }
+            }
+        });
+
+        // Zapisz dane do worktimeData po każdym wczytaniu
+        $('#worktimeTable').on('xhr.dt', function (e, settings, json, xhr) {
+            worktimeData = json || [];
+        });
+    }
+
+    // ----------------------------------
+    // 2) Obsługa modala "Dodaj"
+    // ----------------------------------
+    function openAddModal() {
+        $('#addModal').removeClass('hidden').addClass('flex');
+    }
+    function closeAddModal() {
+        $('#addModal').addClass('hidden').removeClass('flex');
+        $('#addForm')[0].reset();
+    }
+
+    function createWorkTime() {
+        const payload = {
+            driverId: parseInt($('#addDriverSelect').val(), 10),
+            date: $('#addDate').val(),
+            drivingMinutes: parseInt($('#addDriving').val(), 10),
+            breakMinutes: parseInt($('#addBreak').val(), 10),
+            otherWorkMinutes: parseInt($('#addOther').val(), 10),
+            restMinutes: parseInt($('#addRest').val(), 10)
+        };
+        $.ajax({
+            url: '/api/worktime',
+            method: 'POST',
+            headers: { 'Authorization': 'transprokey' },
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (resp) {
+                Swal.fire('Sukces!', resp, 'success');
+                closeAddModal();
+                worktimeTable.ajax.reload();
+            },
+            error: function (xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się dodać wpisu.', 'error');
+            }
+        });
+    }
+
+    // ----------------------------------
+    // 3) Obsługa modala "Edytuj"
+    // ----------------------------------
+    function openEditModal() {
+        $('#editModal').removeClass('hidden').addClass('flex');
+    }
+    function closeEditModal() {
+        $('#editModal').addClass('hidden').removeClass('flex');
+        $('#editForm')[0].reset();
+    }
+
+    // Wypełnienie edytora danymi z tabeli
+    function openEditModalData(id) {
+        const record = worktimeData.find(r => r.id === id);
+        if (!record) {
+            Swal.fire('Błąd!', 'Nie znaleziono wpisu.', 'error');
+            return;
+        }
+        // ID
+        $('#editId').val(record.id);
+
+        // Ustaw wybranego kierowcę w <select>
+        if (record.driver) {
+            $('#editDriverSelect').val(record.driver.id || '');
+        } else {
+            $('#editDriverSelect').val('');
+        }
+
+        // Pozostałe pola
+        $('#editDate').val(record.date);
+        $('#editDriving').val(record.drivingMinutes);
+        $('#editBreak').val(record.breakMinutes);
+        $('#editOther').val(record.otherWorkMinutes);
+        $('#editRest').val(record.restMinutes);
+
+        openEditModal();
+    }
+
+    function updateWorkTime() {
+        const id = $('#editId').val();
+        const payload = {
+            driverId: parseInt($('#editDriverSelect').val(), 10) || null,
+            date: $('#editDate').val(),
+            drivingMinutes: parseInt($('#editDriving').val(), 10),
+            breakMinutes: parseInt($('#editBreak').val(), 10),
+            otherWorkMinutes: parseInt($('#editOther').val(), 10),
+            restMinutes: parseInt($('#editRest').val(), 10)
+        };
+        $.ajax({
+            url: '/api/worktime/' + id,
+            method: 'PUT',
+            headers: { 'Authorization': 'transprokey' },
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (resp) {
+                Swal.fire('Sukces!', resp, 'success');
+                closeEditModal();
+                worktimeTable.ajax.reload();
+            },
+            error: function (xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się zaktualizować wpisu.', 'error');
+            }
+        });
+    }
+
+    // ----------------------------------
+    // 4) Usuwanie
+    // ----------------------------------
+    function deleteWorkTime(id) {
+        Swal.fire({
+            title: 'Jesteś pewien?',
+            text: "Nie będziesz mógł tego cofnąć!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Tak, usuń to!',
+            cancelButtonText: 'Anuluj'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/api/worktime/' + id,
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'transprokey' },
+                    success: function (resp) {
+                        Swal.fire('Usunięto!', resp, 'success');
+                        worktimeTable.ajax.reload();
+                    },
+                    error: function () {
+                        Swal.fire('Błąd!', 'Nie udało się usunąć wpisu.', 'error');
+                    }
+                });
+            }
+        });
+    }
+</script>
 </body>
 </html>

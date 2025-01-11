@@ -36,12 +36,12 @@
             <!-- Button to add a new WORK schedule -->
             <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
                     onclick="openAddWorkModal()">
-                <i class="fa fa-calendar-check mr-1"></i>Dodaj grafik (WORK)
+                <i class="fa fa-calendar-check mr-1"></i>Dodaj grafik
             </button>
             <!-- Button to add a new VACATION -->
             <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
                     onclick="openAddVacationModal()">
-                <i class="fa fa-umbrella-beach mr-1"></i>Dodaj urlop (VACATION)
+                <i class="fa fa-umbrella-beach mr-1"></i>Dodaj urlop
             </button>
         </div>
     </header>
@@ -55,7 +55,7 @@
 <!-- Modal: Add WORK -->
 <div id="addWorkModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Grafik (WORK)</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Grafik</h2>
         <form id="addWorkForm">
             <!-- Driver -->
             <div class="mb-4">
@@ -112,7 +112,7 @@
 <!-- Modal: Add VACATION -->
 <div id="addVacationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Urlop (VACATION)</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Urlop</h2>
         <form id="addVacationForm">
             <!-- Driver -->
             <div class="mb-4">
@@ -337,18 +337,18 @@
             driverId: $('#addWorkDriver').val(),
             startDate: $('#addWorkStart').val(),
             endDate: $('#addWorkEnd').val(),
-            color: $('#addWorkColor').val()
+            color: $('#addWorkColor').val(),
+            type: 'WORK'
         };
         $.ajax({
-            url: '/api/schedules', // For WORK type
+            url: '/api/schedules',
             type: 'POST',
-            headers: { 'Authorization': 'transprokey' },
             contentType: 'application/json',
             data: JSON.stringify(workData),
             success: function(res) {
                 Swal.fire('Sukces!', res, 'success');
                 closeAddWorkModal();
-                calendar.refetchEvents(); // reload
+                calendar.refetchEvents();
             },
             error: function(xhr) {
                 Swal.fire('Błąd!', xhr.responseText || 'Nie udało się dodać grafiku.', 'error');
@@ -373,12 +373,12 @@
             driverId: $('#vacationDriver').val(),
             startDate: $('#vacationStart').val(),
             endDate: $('#vacationEnd').val(),
-            color: $('#vacationColor').val()
+            color: $('#vacationColor').val(),
+            type: 'VACATION'
         };
         $.ajax({
-            url: '/api/vacations', // For VACATION type
+            url: '/api/schedules',
             type: 'POST',
-            headers: { 'Authorization': 'transprokey' },
             contentType: 'application/json',
             data: JSON.stringify(vacData),
             success: function(res) {
