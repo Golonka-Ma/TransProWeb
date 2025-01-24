@@ -70,11 +70,13 @@
 
         // Zaktualizowanie wyglądu SweetAlert2
         updateSwalAppearance(isDarkMode);
+
     });
 </script>
 <!-- Pasek boczny -->
 <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
+<script th:src="@{/js/sidebar.js}"></script>
 <!-- Główna zawartość -->
 <div class="sm:ml-64 p-8">
     <header class="flex justify-between items-center mb-8">
@@ -86,11 +88,30 @@
         <p class="text-gray-700 dark:text-gray-300">Tutaj możesz zarządzać użytkownikami, przeglądać ustawienia i wykonywać inne operacje związane z Twoją aplikacją.</p>
     </section>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-2xl font-semibold text-indigo-600 dark:text-secondary" id="drivers-count">28</h3>
+            <p class="text-gray-700 dark:text-gray-300">Kierowcy</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-2xl font-semibold text-indigo-600 dark:text-secondary" id="vehicles-count">22</h3>
+            <p class="text-gray-700 dark:text-gray-300">Pojazdy</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-2xl font-semibold text-indigo-600 dark:text-secondary" id="loads-count">153</h3>
+            <p class="text-gray-700 dark:text-gray-300">Ładunki w tym miesiącu</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-2xl font-semibold text-indigo-600 dark:text-secondary" id="routes-count">43</h3>
+            <p class="text-gray-700 dark:text-gray-300">Ilość odbytych tras w tym miesiącu</p>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Szybki dostęp</h3>
-            <p class="text-gray-700 dark:text-gray-300">Odwiedź kluczowe sekcje swojej aplikacji, takie jak zarządzanie użytkownikami.</p>
-            <a th:href="@{/users}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Użytkownicy</a>
+            <p class="text-gray-700 dark:text-gray-300">Odwiedź kluczowe sekcje swojej aplikacji, takie jak zarządanie flotą.</p>
+            <a th:href="@{/users}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Zarządaj flotą</a>
         </div>
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Ustawienia</h3>
@@ -98,9 +119,9 @@
             <a th:href="@{/settings}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Ustawienia</a>
         </div>
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Statystyki</h3>
-            <p class="text-gray-700 dark:text-gray-300">Przeglądaj statystyki swojej aplikacji w czasie rzeczywistym.</p>
-            <a th:href="@{/stats}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Statystyki</a>
+            <h3 class="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Kierowcy</h3>
+            <p class="text-gray-700 dark:text-gray-300">Przeglądaj listę dodanych kierowców oraz zarządaj ich.</p>
+            <a th:href="@{/drivers}" class="inline-block mt-4 p-2 bg-indigo-600 dark:bg-secondary text-white rounded-lg">Zarządaj kierowcami</a>
         </div>
     </div>
 </div>

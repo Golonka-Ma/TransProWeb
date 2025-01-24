@@ -34,7 +34,6 @@ public class DriverRestController {
     }
 
 
-
     @PostMapping("/add")
     public ResponseEntity<String> addDriver(@RequestBody Driver driver) {
         if (driverService.existsByLicenseNumber(driver.getLicenseNumber())) {
@@ -60,16 +59,14 @@ public class DriverRestController {
             driver.setLastName(updatedDriver.getLastName());
             driver.setLicenseNumber(updatedDriver.getLicenseNumber());
             driver.setLicenseExpiryDate(updatedDriver.getLicenseExpiryDate());
+            driver.setDriverLicenceNumber(updatedDriver.getDriverLicenceNumber());
+            driver.setDriverLicenceExpiryDate(updatedDriver.getDriverLicenceExpiryDate());
             driver.setTachoCardNumber(updatedDriver.getTachoCardNumber());
             driver.setTachoCardExpiryDate(updatedDriver.getTachoCardExpiryDate());
-            if (driverService.existsByLicenseNumber(driver.getLicenseNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Kierowca o takim numerze licencji lub numerze tachografu już istnieje");
-            }
-            if (driverService.existsByTachoCardNumber(driver.getTachoCardNumber())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Kierowca o takim numerze licencji lub numerze tachografu już istnieje");
-            }
+            driver.setCategories(updatedDriver.getCategories());
+            driver.setPoints(updatedDriver.getPoints());
+            driver.setAccidentsCount(updatedDriver.getAccidentsCount());
+            driver.setRestrictions(updatedDriver.getRestrictions());
             driverService.saveDriver(driver);
             return ResponseEntity.ok("Dane kierowcy zostały zaktualizowane");
         } else {

@@ -1,8 +1,10 @@
 package com.example.transpro.model;
 
+import com.example.transpro.type.DrivingCategory;
 import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,10 +28,25 @@ public class Driver {
 
     private LocalDate licenseExpiryDate;
 
+    @Column(unique = true, nullable = false)
+    private String DriverLicenceNumber;
+
+    private LocalDate DriverLicenceExpiryDate;
+
     @Column(unique = true)
     private String tachoCardNumber;
 
     private LocalDate tachoCardExpiryDate;
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "driver_categories", joinColumns = @JoinColumn(name = "driver_id"))
+    @Column(name = "category")
+    private Set<DrivingCategory> categories = new HashSet<>();
+
+    private Integer points;
+    private Integer accidentsCount;
+    private String restrictions;
 
     @ManyToMany
     @JoinTable(
@@ -45,7 +62,6 @@ public class Driver {
     @OneToMany(mappedBy = "driver")
     private List<Load> loads;
 
-    // Tymczasowe pola na sformatowane daty
     @Transient
     private String formattedLicenseExpiryDate;
 

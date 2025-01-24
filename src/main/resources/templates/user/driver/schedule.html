@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TransPro - Grafik Kierowców</title>
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css" rel="stylesheet">
+
+    <!-- DataTables (if needed for anything else) -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <!-- Font Awesome + Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind or your custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+<!-- Optional: Sidebar, theme toggling, etc. -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<script th:src="@{/js/sidebar.js}"></script>
+
+<div class="sm:ml-64 p-8">
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Grafik Kierowców</h1>
+        <div class="space-x-2">
+            <!-- Button to add a new WORK schedule -->
+            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                    onclick="openAddWorkModal()">
+                <i class="fa fa-calendar-check mr-1"></i>Dodaj grafik
+            </button>
+            <!-- Button to add a new VACATION -->
+            <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
+                    onclick="openAddVacationModal()">
+                <i class="fa fa-umbrella-beach mr-1"></i>Dodaj urlop
+            </button>
+        </div>
+    </header>
+
+    <!-- FullCalendar Container -->
+    <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div id="calendar"></div>
+    </section>
+</div>
+
+<!-- Modal: Add WORK -->
+<div id="addWorkModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Grafik</h2>
+        <form id="addWorkForm">
+            <!-- Driver -->
+            <div class="mb-4">
+                <label for="addWorkDriver" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Wybierz kierowcę
+                </label>
+                <select id="addWorkDriver" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </select>
+            </div>
+
+            <!-- Start/End date -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="addWorkStart" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Od
+                    </label>
+                    <input type="date" id="addWorkStart" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="addWorkEnd" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Do
+                    </label>
+                    <input type="date" id="addWorkEnd" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+
+            <!-- Color with live preview -->
+            <div class="mb-4">
+                <label for="addWorkColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kolor (podgląd)
+                </label>
+                <div class="flex items-center space-x-2">
+                    <input type="color" id="addWorkColor" value="#33cc33"
+                           class="mt-1 p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+                           oninput="document.getElementById('addWorkColorPreview').style.backgroundColor = this.value">
+                    <div id="addWorkColorPreview" class="w-6 h-6 border" style="background-color: #33cc33;"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeAddWorkModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    Zapisz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add VACATION -->
+<div id="addVacationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Dodaj Urlop</h2>
+        <form id="addVacationForm">
+            <!-- Driver -->
+            <div class="mb-4">
+                <label for="vacationDriver" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Wybierz kierowcę
+                </label>
+                <select id="vacationDriver" required
+                        class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </select>
+            </div>
+
+            <!-- Start/End date -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="vacationStart" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Od
+                    </label>
+                    <input type="date" id="vacationStart" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="vacationEnd" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Do
+                    </label>
+                    <input type="date" id="vacationEnd" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+
+            <!-- Vacation color (#ff6600) w/ preview -->
+            <div class="mb-4">
+                <label for="vacationColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kolor urlopu (podgląd)
+                </label>
+                <div class="flex items-center space-x-2">
+                    <input type="color" id="vacationColor" value="#ff6600"
+                           class="mt-1 p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+                           oninput="document.getElementById('vacationColorPreview').style.backgroundColor = this.value">
+                    <div id="vacationColorPreview" class="w-6 h-6 border" style="background-color: #ff6600;"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeAddVacationModal()">Anuluj</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    Zapisz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Schedule/Vacation -->
+<div id="editScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full overflow-auto max-h-[90vh]">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Edytuj Grafik/Urlop</h2>
+        <form id="editScheduleForm">
+            <!-- hidden ID -->
+            <input type="hidden" id="editScheduleId">
+
+            <!-- Possibly show driver name read-only, or let user change? -->
+            <div class="mb-4">
+                <label for="editScheduleDriver" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kierowca
+                </label>
+                <input type="text" id="editScheduleDriver" disabled
+                       class="mt-1 block w-full p-2 border rounded-lg bg-gray-200 dark:bg-gray-600 dark:text-white">
+            </div>
+
+            <!-- Start/End date -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="editScheduleStart" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Od
+                    </label>
+                    <input type="date" id="editScheduleStart" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+                <div>
+                    <label for="editScheduleEnd" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Do
+                    </label>
+                    <input type="date" id="editScheduleEnd" required
+                           class="mt-1 block w-full p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+
+            <!-- Color w/ preview -->
+            <div class="mb-4">
+                <label for="editScheduleColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Kolor (podgląd)
+                </label>
+                <div class="flex items-center space-x-2">
+                    <input type="color" id="editScheduleColor" value="#33cc33"
+                           class="mt-1 p-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-white"
+                           oninput="document.getElementById('editSchedulePreview').style.backgroundColor = this.value">
+                    <div id="editSchedulePreview" class="w-6 h-6 border" style="background-color: #33cc33;"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                        onclick="closeEditModal()">Anuluj</button>
+                <button type="button" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                        onclick="deleteSchedule()">Usuń</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    Zapisz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let calendar;
+    let eventsData = [];  // optional local store of events
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize FullCalendar
+        const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'pl',
+            events: loadSchedules,    // function-based approach
+            // When user clicks an event -> open edit modal
+            eventClick: function(info) {
+                // info.event holds the event's data
+                openEditModal(info.event);
+            }
+        });
+        calendar.render();
+
+        // Preload drivers for the add forms
+        preloadDrivers('addWorkDriver');
+        preloadDrivers('vacationDriver');
+
+        // Handle addWorkForm submit
+        $('#addWorkForm').on('submit', function(e) {
+            e.preventDefault();
+            addWorkSchedule();
+        });
+
+        // Handle addVacationForm submit
+        $('#addVacationForm').on('submit', function(e) {
+            e.preventDefault();
+            addVacationSchedule();
+        });
+
+        // Handle editScheduleForm submit
+        $('#editScheduleForm').on('submit', function(e) {
+            e.preventDefault();
+            updateSchedule();
+        });
+    });
+
+    // -----------------------------------
+    // Fetch schedules from /api/schedules
+    // -----------------------------------
+    async function loadSchedules(info, successCallback, failureCallback) {
+        try {
+            const res = await fetch('/api/schedules', {
+                headers: { 'Authorization': 'transprokey' }
+            });
+            const data = await res.json();
+
+            // Convert to FullCalendar event objects
+            // We assume data has: id, driverName, startDate, endDate, color, type
+            const events = data.map(ev => ({
+                id: ev.id,
+                title: ev.driverName,
+                start: ev.startDate,
+                end: ev.endDate,   // If your backend uses inclusive end, you might need .plusDays(1) trick
+                backgroundColor: ev.color || '#33cc33',
+                borderColor: ev.color || '#33cc33',
+                extendedProps: {
+                    scheduleType: ev.type || 'WORK'
+                }
+            }));
+            eventsData = events;  // store locally if you want
+            successCallback(events);
+        } catch (err) {
+            failureCallback(err);
+        }
+    }
+
+    // ------------------------
+    // Preload drivers into <select>
+    // ------------------------
+    function preloadDrivers(selectId) {
+        $.ajax({
+            url: '/api/drivers',
+            method: 'GET',
+            headers: { 'Authorization': 'transprokey' },
+            success: function(drivers) {
+                const sel = document.getElementById(selectId);
+                sel.innerHTML = '<option value="">--Wybierz kierowcę--</option>';
+                drivers.forEach(d => {
+                    let opt = document.createElement('option');
+                    opt.value = d.id;
+                    opt.textContent = d.firstName + ' ' + d.lastName;
+                    sel.appendChild(opt);
+                });
+            }
+        });
+    }
+
+    // -------------------------------------------------
+    // Show/Hide "Add Work" modal
+    // -------------------------------------------------
+    function openAddWorkModal() {
+        $('#addWorkModal').removeClass('hidden').addClass('flex');
+    }
+    function closeAddWorkModal() {
+        $('#addWorkModal').addClass('hidden').removeClass('flex');
+        $('#addWorkForm')[0].reset();
+    }
+
+    // POST /api/schedules
+    function addWorkSchedule() {
+        const workData = {
+            driverId: $('#addWorkDriver').val(),
+            startDate: $('#addWorkStart').val(),
+            endDate: $('#addWorkEnd').val(),
+            color: $('#addWorkColor').val(),
+            type: 'WORK'
+        };
+        $.ajax({
+            url: '/api/schedules',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(workData),
+            success: function(res) {
+                Swal.fire('Sukces!', res, 'success');
+                closeAddWorkModal();
+                calendar.refetchEvents();
+            },
+            error: function(xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się dodać grafiku.', 'error');
+            }
+        });
+    }
+
+    // -------------------------------------------------
+    // Show/Hide "Add Vacation" modal
+    // -------------------------------------------------
+    function openAddVacationModal() {
+        $('#addVacationModal').removeClass('hidden').addClass('flex');
+    }
+    function closeAddVacationModal() {
+        $('#addVacationModal').addClass('hidden').removeClass('flex');
+        $('#addVacationForm')[0].reset();
+    }
+
+    // POST /api/vacations
+    function addVacationSchedule() {
+        const vacData = {
+            driverId: $('#vacationDriver').val(),
+            startDate: $('#vacationStart').val(),
+            endDate: $('#vacationEnd').val(),
+            color: $('#vacationColor').val(),
+            type: 'VACATION'
+        };
+        $.ajax({
+            url: '/api/schedules',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(vacData),
+            success: function(res) {
+                Swal.fire('Sukces!', res, 'success');
+                closeAddVacationModal();
+                calendar.refetchEvents();
+            },
+            error: function(xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się dodać urlopu.', 'error');
+            }
+        });
+    }
+
+    // -------------------------------------------------
+    // "Edit" modal triggered by eventClick
+    // -------------------------------------------------
+    let currentScheduleId = null; // store for delete or update
+
+    function openEditModal(fcEvent) {
+        // fcEvent: FullCalendar's event object
+        currentScheduleId = fcEvent.id;
+
+        // Fill form fields
+        document.getElementById('editScheduleId').value = currentScheduleId;
+        document.getElementById('editScheduleDriver').value = fcEvent.title; // read-only text
+        document.getElementById('editScheduleStart').value = fcEvent.startStr.substring(0, 10);
+        // endStr is exclusive if your backend returns that, so maybe do a date minus 1 day. Adjust to your actual data
+        if (fcEvent.end) {
+            // fcEvent.end is exclusive in FC, so you might need to parse it
+            let endStr = fcEvent.endStr.substring(0,10);
+            document.getElementById('editScheduleEnd').value = endStr;
+        }
+        document.getElementById('editScheduleColor').value = fcEvent.backgroundColor || '#33cc33';
+        document.getElementById('editSchedulePreview').style.backgroundColor = fcEvent.backgroundColor || '#33cc33';
+
+        // Show the modal
+        $('#editScheduleModal').removeClass('hidden').addClass('flex');
+    }
+
+    function closeEditModal() {
+        $('#editScheduleModal').addClass('hidden').removeClass('flex');
+        $('#editScheduleForm')[0].reset();
+        currentScheduleId = null;
+    }
+
+    // PUT /api/schedules/{id}
+    function updateSchedule() {
+        if (!currentScheduleId) return;
+
+        const data = {
+            startDate: $('#editScheduleStart').val(),
+            endDate: $('#editScheduleEnd').val(),
+            color: $('#editScheduleColor').val()
+            // If you want to let user switch "type", add it here
+            // driverId: ...
+        };
+
+        $.ajax({
+            url: `/api/schedules/${currentScheduleId}`,
+            type: 'PUT',
+            headers: { 'Authorization': 'transprokey' },
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(res) {
+                Swal.fire('Sukces!', res, 'success');
+                closeEditModal();
+                calendar.refetchEvents();
+            },
+            error: function(xhr) {
+                Swal.fire('Błąd!', xhr.responseText || 'Nie udało się zaktualizować grafiku/urlopu.', 'error');
+            }
+        });
+    }
+
+    // DELETE /api/schedules/{id}
+    function deleteSchedule() {
+        if (!currentScheduleId) return;
+
+        Swal.fire({
+            title: 'Jesteś pewien?',
+            text: "Nie będziesz mógł tego cofnąć!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Tak, usuń to!',
+            cancelButtonText: 'Anuluj'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/api/schedules/${currentScheduleId}`,
+                    type: 'DELETE',
+                    headers: { 'Authorization': 'transprokey' },
+                    success: function(res) {
+                        Swal.fire('Usunięto!', res, 'success');
+                        closeEditModal();
+                        calendar.refetchEvents();
+                    },
+                    error: function() {
+                        Swal.fire('Błąd!', 'Nie udało się usunąć.', 'error');
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

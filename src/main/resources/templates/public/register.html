@@ -117,8 +117,8 @@
       confirmPasswordError.textContent = 'Hasła nie są identyczne.';
       return false; // Zatrzymuje wysyłanie formularza
     }
-
-    return true; // Pozwala na wysłanie formularza
+    window.location.href = "/login";
+    return true;
   }
 </script>
 </body>

@@ -3,60 +3,167 @@
 <head>
   <!-- Font Awesome CSS -->
   <link rel="stylesheet" th:href="@{/css/all.min.css}">
+  <!-- Include your Tailwind CSS file -->
+  <link rel="stylesheet" th:href="@{/css/output.css}">
 </head>
 <body>
 <div th:fragment="sidebar">
   <!-- Pasek boczny -->
   <aside id="sidebar"
-         class="fixed top-0 left-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform transform -translate-x-full sm:translate-x-0"
+         class="fixed top-0 left-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-200
+                dark:border-gray-700 transition-transform transform -translate-x-full sm:translate-x-0"
          aria-label="Sidebar">
     <div class="h-full flex flex-col justify-between px-3 pb-4 overflow-y-auto bg-gray-100 dark:bg-gray-800">
       <!-- Logo i nazwa aplikacji -->
-      <div class="flex flex-col items-center pt-4">
+      <div class="flex flex-col items-center pt-4 cursor-pointer" onclick="window.location.href = '/home'">
         <img src="/media/app/logo.png" alt="Logo firmy" class="h-16 mb-2">
-        <span class="text-2xl font-semibold text-gray-900 dark:text-white">Trans<span class="text-2xl font-semibold dark:text-red-900">Pro</span></span>
+        <span class="text-2xl font-semibold text-gray-900 dark:text-white">
+          Trans<span class="text-2xl font-semibold dark:text-red-900">Pro</span>
+        </span>
       </div>
 
       <!-- Lista opcji menu -->
       <ul class="space-y-2 font-medium flex-grow mt-6">
+
+        <!-- Ekran domowy -->
         <li th:classappend="${path == '/home'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/home}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <a th:href="@{/home}"
+             class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
             <i class="fas fa-home text-gray-500 dark:text-gray-400 mr-3"></i>
             Ekran domowy
           </a>
         </li>
-        <li th:classappend="${path == '/drivers'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/drivers}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
-            <i class="fas fa-user-friends text-gray-500 dark:text-gray-400 mr-3"></i>
-            Kierowcy
-          </a>
+
+        <!-- Kierowcy (submenu) -->
+        <li>
+          <!-- Toggle Button -->
+          <button type="button"
+                  class="flex items-center justify-between p-2 w-full text-gray-900 dark:text-white
+                         hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition"
+                  onclick="toggleSubMenu('drivers-submenu', 'drivers-chevron')">
+            <span class="flex items-center">
+              <i class="fas fa-user-friends text-gray-500 dark:text-gray-400 mr-3"></i>
+              Kierowcy
+            </span>
+            <!-- Chevron -->
+            <i id="drivers-chevron"
+               class="fas fa-chevron-down text-gray-500 dark:text-gray-400 ml-2"
+               th:classappend="${#strings.startsWith(path, '/drivers') || #strings.startsWith(path, '/timeofwork')
+                 || #strings.startsWith(path, '/grafikofdrivers')} ? ' rotate-180' : ''"></i>
+          </button>
+
+          <!-- Submenu -->
+          <ul id="drivers-submenu"
+              class="pl-8 space-y-1 mt-1 transition-all"
+              th:classappend="${#strings.startsWith(path, '/drivers') || #strings.startsWith(path, '/timeofwork')
+                || #strings.startsWith(path, '/grafikofdrivers')} ? '' : ' hidden'">
+
+            <li th:classappend="${path == '/drivers'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/drivers}"
+                 class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-user-gear text-gray-500 dark:text-gray-400 mr-2"></i>
+                Kierowcy
+              </a>
+            </li>
+            <li th:classappend="${path == 'drivers/timeofwork'} ? 'bg-gray-200 dark:bg-gray-700 rounded-l'">
+              <a th:href="@{/drivers/timeofwork}"
+                 class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-clock text-gray-500 dark:text-gray-400 mr-2"></i>
+                Czas pracy
+              </a>
+            </li>
+            <li th:classappend="${path == 'drivers/schedule'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/drivers/schedule}"
+                 class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-calendar-alt text-gray-500 dark:text-gray-400 mr-2"></i>
+                Grafik
+              </a>
+            </li>
+
+          </ul>
         </li>
+
+        <!-- Trasy -->
         <li th:classappend="${path == '/routes'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/routes}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <a th:href="@{/routes}"
+             class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200
+                    dark:hover:bg-gray-700 rounded-lg">
             <i class="fas fa-map-location-dot text-gray-500 dark:text-gray-400 mr-3"></i>
             Trasy
           </a>
         </li>
+
+        <!-- Ładunki -->
         <li th:classappend="${path == '/cargo'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/cargo}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <a th:href="@{/cargo}"
+             class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200
+                    dark:hover:bg-gray-700 rounded-lg">
             <i class="fas fa-boxes-stacked text-gray-500 dark:text-gray-400 mr-3"></i>
             Ładunki
           </a>
         </li>
-        <li th:classappend="${path == '/fleet'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/fleet}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
-            <i class="fas fa-truck-fast text-gray-500 dark:text-gray-400 mr-3"></i>
-            Flota
-          </a>
+
+        <!-- Flota (submenu) -->
+        <li>
+          <!-- Toggle Button -->
+          <button type="button"
+                  class="flex items-center justify-between p-2 w-full text-gray-900 dark:text-white
+                         hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition"
+                  onclick="toggleSubMenu('fleet-submenu', 'fleet-chevron')">
+            <span class="flex items-center">
+              <i class="fas fa-truck-fast text-gray-500 dark:text-gray-400 mr-3"></i>
+              Flota
+            </span>
+            <!-- Chevron -->
+            <i id="fleet-chevron"
+               class="fas fa-chevron-down text-gray-500 dark:text-gray-400 ml-2"
+               th:classappend="${#strings.startsWith(path, '/fleet')} ? ' rotate-180' : ''"></i>
+          </button>
+
+          <!-- Submenu -->
+          <ul id="fleet-submenu"
+              class="pl-8 space-y-1 mt-1 transition-all"
+              th:classappend="${#strings.startsWith(path, '/fleet')} ? '' : ' hidden'">
+            <!-- Pojazdy -->
+            <li th:classappend="${path == '/fleet/vehicles'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/fleet/vehicles}"
+                 class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-car text-gray-500 dark:text-gray-400 mr-2"></i>
+                Pojazdy
+              </a>
+            </li>
+            <li th:classappend="${path == '/fleet/trailers'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/fleet/trailers}"
+                 class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-trailer text-gray-500 dark:text-gray-400 mr-2"></i>
+                Naczepy
+              </a>
+            </li>
+            <li th:classappend="${path == '/fleet/sets'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
+              <a th:href="@{/fleet/sets}"
+                 class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+                <i class="fas fa-truck-container text-gray-500 dark:text-gray-400 mr-2"></i>
+                Zestawy
+              </a>
+            </li>
+          </ul>
         </li>
+
+        <!-- Koszty -->
         <li th:classappend="${path == '/costs'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/costs}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <a th:href="@{/costs}"
+             class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200
+                    dark:hover:bg-gray-700 rounded-lg">
             <i class="fas fa-euro-sign text-gray-500 dark:text-gray-400 mr-3"></i>
             Koszty
           </a>
         </li>
+
+        <!-- Komunikator -->
         <li th:classappend="${path == '/messenger'} ? 'bg-gray-200 dark:bg-gray-700 rounded-lg'">
-          <a th:href="@{/messenger}" class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <a th:href="@{/messenger}"
+             class="flex items-center p-2 text-gray-900 dark:text-white hover:bg-gray-200
+                    dark:hover:bg-gray-700 rounded-lg">
             <i class="fas fa-messages text-gray-500 dark:text-gray-400 mr-3"></i>
             Komunikator
           </a>
@@ -66,13 +173,18 @@
       <!-- Sekcja z przyciskami na dole -->
       <div class="space-y-2 pb-6">
         <!-- Przycisk zmiany trybu -->
-        <button id="theme-toggle" class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg" onclick="toggleTheme()">
+        <button id="theme-toggle"
+                class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white
+                       hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"
+                onclick="toggleTheme()">
           <i id="theme-icon" class="fas fa-moon text-gray-500 dark:text-gray-400 mr-2"></i>
           <span id="theme-text">Tryb ciemny</span>
         </button>
 
         <!-- Przycisk ustawienia -->
-        <a th:href="@{/settings}" class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+        <a th:href="@{/settings}"
+           class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white
+                  hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
           <i class="fas fa-cog text-gray-500 dark:text-gray-400 mr-2"></i>
           Ustawienia
         </a>
@@ -80,7 +192,9 @@
         <!-- Przycisk wylogowania -->
         <form th:action="@{/logout}" method="post">
           <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit" class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-red-500 dark:hover:bg-red-500">
+          <button type="submit"
+                  class="flex items-center justify-center p-2 w-full text-gray-900 dark:text-white
+                         border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-red-500 dark:hover:bg-red-500">
             <i class="fas fa-sign-out-alt text-gray-500 dark:text-gray-400 mr-2"></i>
             Wyloguj się
           </button>
@@ -89,5 +203,6 @@
     </div>
   </aside>
 </div>
+
 </body>
 </html>

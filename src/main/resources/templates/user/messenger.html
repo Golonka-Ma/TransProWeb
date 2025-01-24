@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>TransPro - Komunikator</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <!-- Czcionki i ikony -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/all.min.css}">
+    <style>
+        .message-bubble {
+            max-width: 60%;
+            word-break: break-word;
+        }
+        .message-bubble-sender {
+            background-color: #3b82f6; /* niebieski Tailwind */
+            color: white;
+            align-self: flex-end;
+        }
+        .message-bubble-receiver {
+            background-color: #e5e7eb; /* szary Tailwind */
+            color: #111827;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+<script>
+    function toggleTheme() {
+        const htmlElement = document.documentElement;
+        htmlElement.classList.toggle('dark');
+        const isDarkMode = htmlElement.classList.contains('dark');
+        const icon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDarkMode);
+            icon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        if (themeText) {
+            themeText.textContent = isDarkMode ? 'Tryb jasny' : 'Tryb ciemny';
+        }
+
+        localStorage.setItem('isDarkMode', isDarkMode);
+        updateSwalAppearance(isDarkMode);
+    }
+
+    function updateSwalAppearance(isDarkMode) {
+        Swal.mixin({
+            customClass: {
+                popup: isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        }
+
+        const icon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        if (icon) {
+            icon.classList.toggle('fa-sun', isDarkMode);
+            icon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        if (themeText) {
+            themeText.textContent = isDarkMode ? 'Tryb jasny' : 'Tryb ciemny';
+        }
+
+        updateSwalAppearance(isDarkMode);
+    });
+</script>
+
+<!-- Pasek boczny -->
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<script th:src="@{/js/sidebar.js}"></script>
+<!-- Główna zawartość -->
+<div class="sm:ml-64 p-4 sm:p-8 h-screen flex flex-col">
+    <!-- Nagłówek strony -->
+    <header class="flex justify-between items-center mb-4">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Komunikator</h1>
+        <button onclick="toggleTheme()" class="focus:outline-none text-gray-600 dark:text-gray-300">
+            <i id="theme-icon" class="fa-solid fa-moon"></i>
+            <span id="theme-text" class="ml-2">Tryb ciemny</span>
+        </button>
+    </header>
+
+    <!-- Sekcja czatu i listy użytkowników -->
+    <div class="flex flex-col-reverse md:flex-row-reverse gap-4 h-full">
+        <!-- Lista użytkowników -->
+        <div class="md:w-1/4 w-full bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col">
+            <div class="mb-4">
+                <input type="text" id="searchUser" placeholder="Szukaj użytkownika..."
+                       class="w-full p-2 rounded border dark:bg-gray-700 dark:border-gray-600"/>
+            </div>
+            <ul id="userList" class="overflow-y-auto flex-grow space-y-2"></ul>
+        </div>
+
+        <!-- Główny obszar czatu -->
+        <div class="md:w-3/4 w-full bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex flex-col">
+            <div id="chatHeader" class="mb-4 border-b border-gray-300 dark:border-gray-600 pb-2">
+                <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Wybierz użytkownika, aby rozpocząć czat</h2>
+            </div>
+            <div id="messageArea" class="flex-grow overflow-y-auto mb-4 px-2 py-2 space-y-2"
+                 style="max-height: 60vh;">
+            </div>
+            <form id="messageForm" class="flex">
+                <input type="text" id="message" placeholder="Wpisz wiadomość..." autocomplete="off"
+                       class="flex-grow p-2 rounded-l border dark:bg-gray-700 dark:border-gray-600">
+                <button type="submit" class="p-2 bg-blue-500 text-white rounded-r hover:bg-blue-600">
+                    Wyślij
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var currentUsername = [[${#authentication.name}]];
+</script>
+
+<!-- Biblioteki JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<!-- Skrypt JavaScript -->
+<script th:inline="javascript">
+    var stompClient = null;
+    var selectedUser = null;
+
+    function connect() {
+        var socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Połączono: ' + frame);
+            stompClient.subscribe('/user/queue/messages', function (messageOutput) {
+                showMessage(JSON.parse(messageOutput.body));
+            });
+            loadUsers();
+        }, function (error) {
+            console.log('Błąd połączenia: ' + error);
+        });
+    }
+
+    function sendMessage() {
+        var messageContent = document.getElementById('message').value.trim();
+        if (messageContent && stompClient && selectedUser) {
+            var chatMessage = {
+                content: messageContent,
+                receiverUsername: selectedUser,
+                timestamp: new Date()
+            };
+            stompClient.send("/app/private-message", {}, JSON.stringify(chatMessage));
+            document.getElementById('message').value = '';
+        }
+    }
+
+    function showMessage(message) {
+        if (!selectedUser) return;
+        if (selectedUser === message.sender.username || selectedUser === message.receiver.username) {
+            var messageArea = document.getElementById('messageArea');
+            var messageElement = document.createElement('div');
+            messageElement.classList.add('flex', 'mb-2', 'w-full');
+
+            var bubble = document.createElement('div');
+            bubble.classList.add('message-bubble', 'p-2', 'rounded-lg');
+
+            // Jeśli nadawca to aktualny użytkownik - wiadomość z prawej
+            if (message.sender.username === currentUsername) {
+                bubble.classList.add('message-bubble-sender', 'ml-auto');
+            } else {
+                // Inaczej, wiadomość z lewej
+                bubble.classList.add('message-bubble-receiver', 'mr-auto');
+            }
+
+            bubble.textContent = message.content;
+            messageElement.appendChild(bubble);
+            messageArea.appendChild(messageElement);
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+    }
+
+    function loadUsers() {
+        fetch('/api/users', {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                var userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                data.forEach(user => {
+                    var userItem = document.createElement('li');
+                    userItem.classList.add('p-2', 'cursor-pointer', 'rounded', 'flex', 'items-center', 'gap-2', 'hover:bg-gray-200', 'dark:hover:bg-gray-700', 'transition', 'duration-150', 'ease-in-out');
+
+                    var avatar = document.createElement('div');
+                    avatar.classList.add('w-8', 'h-8', 'bg-blue-500', 'text-white', 'flex', 'items-center', 'justify-center', 'rounded-full');
+                    avatar.textContent = user.username.charAt(0).toUpperCase();
+
+                    var usernameSpan = document.createElement('span');
+                    usernameSpan.textContent = user.username;
+
+                    userItem.appendChild(avatar);
+                    userItem.appendChild(usernameSpan);
+
+                    userItem.addEventListener('click', function () {
+                        selectUser(user.username);
+                    });
+                    userList.appendChild(userItem);
+                });
+            })
+            .catch(error => {
+                console.error('Błąd podczas ładowania listy użytkowników:', error);
+            });
+    }
+
+    function selectUser(username) {
+        selectedUser = username;
+        document.getElementById('chatHeader').innerHTML =
+            '<h2 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Czat z ' + username + '</h2>';
+        document.getElementById('messageArea').innerHTML = '';
+        loadChatHistory(username);
+    }
+
+    function loadChatHistory(username) {
+        fetch('/api/messages/' + username, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(message => {
+                    showMessage(message);
+                });
+            })
+            .catch(error => {
+                console.error('Błąd podczas ładowania historii czatu:', error);
+            });
+    }
+
+    document.getElementById('messageForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        sendMessage();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        connect();
+    });
+</script>
+</body>
+</html>
