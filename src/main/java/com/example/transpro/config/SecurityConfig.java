@@ -27,7 +27,6 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
-    @Value("${jwt.secret:SekretnyKluczJWT1234567890123456}")
     private String jwtSecret;
 
     public SecurityConfig(UserService userService, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
