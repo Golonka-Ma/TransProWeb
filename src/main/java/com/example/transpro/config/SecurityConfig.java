@@ -1,4 +1,3 @@
-// SecurityConfig.java
 package com.example.transpro.config;
 
 import com.example.transpro.service.UserService;
@@ -58,7 +57,7 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .invalidSessionUrl("/login?session=expired")
                 )
-                .cors(); // Włącz CORS
+                .cors();
 
         return http.build();
     }
