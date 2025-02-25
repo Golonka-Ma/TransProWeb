@@ -25,19 +25,16 @@ public class Message {
     @Transient
     private String receiverUsername;
 
-    // Relacja z nadawcą
     @ManyToOne
     @JoinColumn(name = "sender_id")
     @JsonIgnoreProperties({"password", "email", "roles"})
     private User sender;
 
-    // Relacja z odbiorcą (opcjonalnie dla wiadomości prywatnych)
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     @JsonIgnoreProperties({"password", "email", "roles"})
     private User receiver;
 
-    // Relacja z czatem grupowym (opcjonalnie)
     @ManyToOne
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
