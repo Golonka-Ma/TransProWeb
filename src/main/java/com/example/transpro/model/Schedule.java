@@ -17,7 +17,6 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relationship to the Driver
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
@@ -25,8 +24,8 @@ public class Schedule {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    private String color; // e.g. "#33cc33"
+    private String color;
 
     @Enumerated(EnumType.STRING)
-    private ScheduleType type; // WORK or VACATION
+    private ScheduleType type;
 }
