@@ -46,7 +46,6 @@ public class WorkTimeController {
 
         // 3) Podstawowe kontrole ogranicze  w oparciu o podsumowanie
         if (request.getDrivingMinutes() > 600) {
-            // Przyjmijmy 600 min (10 godzin) jako absolutny dobowy limit jazdy w tym przyk adzie
             return ResponseEntity.badRequest().body("Czas jazdy przekracza dobowy limit (10h).");
         }
 
