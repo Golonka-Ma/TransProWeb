@@ -15,7 +15,7 @@ public class Cost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type; // Np. "Paliwo", "Opłata drogowa", "Serwis"
+    private String type;
 
     private Double amount;
 
@@ -23,17 +23,14 @@ public class Cost {
 
     private String description;
 
-    // Relacja z kierowcą
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
-    // Relacja z pojazdem (opcjonalnie)
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
-    // Dodatkowe pola, np. numer dokumentu
     private String documentNumber;
 }
 
