@@ -14,8 +14,8 @@ import java.util.List;
 public class VehicleSetService {
 
     private final VehicleSetRepository vehicleSetRepository;
-    private final VehicleRepository vehicleRepository;  // If needed
-    private final DriverRepository driverRepository;    // If needed
+    private final VehicleRepository vehicleRepository;
+    private final DriverRepository driverRepository;
 
     public VehicleSetService(VehicleSetRepository vehicleSetRepository,
                              VehicleRepository vehicleRepository,
@@ -25,20 +25,18 @@ public class VehicleSetService {
         this.driverRepository = driverRepository;
     }
 
-    // Create new set
     public VehicleSet createSet(Long truckId, Long trailerId, Long driverId) {
         Vehicle truck = vehicleRepository.findById(truckId)
                 .orElseThrow(() -> new IllegalArgumentException("Truck not found"));
         Vehicle trailer = vehicleRepository.findById(trailerId)
                 .orElseThrow(() -> new IllegalArgumentException("Trailer not found"));
         Driver driver = driverRepository.findById(driverId)
-                .orElse(null);  // or throw if required
+                .orElse(null);
 
         VehicleSet vehicleSet = new VehicleSet();
         vehicleSet.setTruck(truck);
         vehicleSet.setTrailer(trailer);
         vehicleSet.setDriver(driver);
-        // ... set more fields as needed
         return vehicleSetRepository.save(vehicleSet);
     }
 
