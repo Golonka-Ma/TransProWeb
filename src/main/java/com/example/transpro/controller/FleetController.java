@@ -17,16 +17,16 @@ public class FleetController {
 
     @GetMapping("/vehicles")
     public String vehiclesPage() {
-        return "user/fleet/vehicles"; // This will load vehicles.html
+        return "user/fleet/vehicles";
     }
 
     @GetMapping("/trailers")
     public String trailersPage() {
-        return "user/fleet/trailers"; // This will load trailers.html
+        return "user/fleet/trailers";
     }
 
     @GetMapping("/sets")
     public String setsPage() {
-        return "user/fleet/sets"; // If you have a sets.html for "zestawy"
+        return "user/fleet/sets";
     }
 }
