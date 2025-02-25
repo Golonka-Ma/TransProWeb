@@ -29,22 +29,18 @@ public class Vehicle {
     @Column(unique = true)
     private String vin;
 
-    // Now we add the VehicleType field
+
     @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
 
-    // TrailerType (only relevant if it's actually a trailer)
     @Enumerated(EnumType.STRING)
     private TrailerType trailerType;
 
-    // Relacja z kierowcami (opcjonalnie)
     @ManyToMany(mappedBy = "vehicles")
     private Set<Driver> drivers;
 
-    // Dodatkowe pola, np. stan techniczny
     private String technicalCondition;
 
-    // Relacja z trasami (opcjonalnie)
     @OneToMany(mappedBy = "vehicle")
     private List<Route> routes;
 }
