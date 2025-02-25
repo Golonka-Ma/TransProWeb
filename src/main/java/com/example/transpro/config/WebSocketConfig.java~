@@ -1,4 +1,3 @@
-// src/main/java/com/example/transpro/config/WebSocketConfig.java
 package com.example.transpro.config;
 
 import org.springframework.context.annotation.Configuration;
