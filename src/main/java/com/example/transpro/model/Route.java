@@ -28,16 +28,13 @@ public class Route {
 
     private LocalDateTime plannedEndTime;
 
-    // Relacja z ładunkami
     @OneToMany(mappedBy = "route")
     private List<Load> loads;
 
-    // Relacja z pojazdem
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
-    // Relacja z kierowcą (opcjonalnie, jeśli trasa jest przypisana bezpośrednio do kierowcy)
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private Driver driver;
