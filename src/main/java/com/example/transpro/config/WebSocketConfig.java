@@ -1,4 +1,3 @@
-// src/main/java/com/example/transpro/config/WebSocketConfig.java
 package com.example.transpro.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
-        registration.setMessageSizeLimit(8192) // Adjust as needed
+        registration.setMessageSizeLimit(8192)
                 .setSendBufferSizeLimit(512 * 1024)
                 .setSendTimeLimit(20000);
     }
