@@ -1,11 +1,7 @@
 # TransPro - Transport Management System
 
-## Project topic
-Real-time Transport Management and Driver Communication Platform
-
-
 ## Project description
-TransPro is an integrated system designed to streamline vehicle fleet operations, load management, driver communication, and cost tracking. It provides a web-based interface for dispatchers or administrators to manage routes, drivers, loads, and vehicles, alongside a mobile app for drivers that enables real-time communication and operational updates (e.g., load details, messaging). By leveraging Spring Boot for the backend and Thymeleaf and Tailwind CSS (plus React Native) for the frontends, TransPro ensures a cohesive and consistent workflow from creating a route or load entry to finalizing costs.
+TransPro is an integrated fleet management system developed as part of my BSc Thesis. It streamlines vehicle fleet operations, load management, driver communication, and cost tracking. The system includes a web-based platform for dispatchers and administrators to manage routes, drivers, loads, and vehicles, as well as a mobile app for drivers to enable real-time communication and operational updates (e.g., load details, messaging). Built with Spring Boot for the backend and Thymeleaf + Tailwind CSS for the frontend, TransPro ensures a seamless workflow—from route creation to cost finalization.
 
 ## Features
 - **Driver Management**: Add, edit, and delete driver records. Include license details, tacho card info, categories, etc.
@@ -19,25 +15,34 @@ TransPro is an integrated system designed to streamline vehicle fleet operations
 - **Mobile Driver App**: Built in React Native, providing chat, login, home screen, and potential expansions for route or load details.
 
 ## Aplikacja showcase
-Below is a short `.mp4` file demonstrating the key functionalities of TransPro in action. [See Showcase Video](#)  
-(*Replace the link above with an actual .mp4 or embed.*)
+Below is a short demonstration the key functionalities of TransPro in action.  
+
+
+https://github.com/user-attachments/assets/dec1fd54-8dee-494c-9102-ffca3a3fc834
+
 
 ---
+
+## Full Project Documentation
+For a detailed explanation of TransPro, including its architecture, implementation, and technical decisions, you can read my BSc Thesis:
+[TransPro_Thesis.pdf](https://github.com/user-attachments/files/19061417/TransPro_Thesis.pdf)
+
 
 ## Technology used
 
 ### Backend
 - **Java Spring Boot** (REST controllers, JPA repositories, security)
 - **Spring Security** (JWT-based authentication)
-- **Hibernate & JPA** for ORM
+- **Java Persistence API (JPA) with Hibernate** for ORM
 - **H2** in test environment
-- **PostgreSQL** (or another RDBMS) in production
+- **PostgreSQL**
 
 ### Frontend
 - **Thymeleaf** with **Tailwind CSS**
 - **React Native** (Expo) for the mobile driver application
 - **Axios** for HTTP requests
-- **
+- **FullCalendar**
+- **sweetalert2**
 
 ### Build and test tools
 - **Maven** or **Gradle** for building the backend
@@ -114,14 +119,12 @@ Active development includes:
 
 ---
 
-## Running the project
 
-### Prerequisites
-Ensure Java, Node, npm/yarn are installed. Check environment variables for correct database config.
-
-### BackEnd (Spring Boot)
-- Inside the backend folder: `mvn spring-boot:run` (or the Gradle equivalent)  
-  or generate a `.jar` with `mvn clean install` and then `java -jar target/transpro-backend.jar`.
+## Contact
+For any questions or suggestions, feel free to contact the developer:
+- **Email**: marcin.golonka21@gmail.com  
+- **GitHub**: [TransProWeb Repository](https://github.com/Golonka-Ma/TransProWeb)  
+- **LinkedIn**: [Marcin Golonka](https://www.linkedin.com/in/marcin-golonka-4510a928b/)  
 
 ### Test
 Run `mvn test` to execute unit and integration tests. The in-memory database (H2) or a Docker container may be used automatically, ensuring minimal manual config.
@@ -136,3 +139,5 @@ Integration tests spin up the entire Spring context, possibly an in-memory DB, t
 For a comprehensive list of endpoints, request bodies, and responses, refer to the auto-generated docs (e.g., **Swagger** if integrated) or the dedicated [API documentation link](#) in the project resources.
 
 ---
+
+
