@@ -5,7 +5,7 @@ Real-time Transport Management and Driver Communication Platform
 
 
 ## Project description
-TransPro is an integrated system designed to streamline vehicle fleet operations, load management, driver communication, and cost tracking. It provides a web-based interface for dispatchers or administrators to manage routes, drivers, loads, and vehicles, alongside a mobile app for drivers that enables real-time communication and operational updates (e.g., load details, messaging). By leveraging Spring Boot for the backend and React (plus React Native) for the frontends, TransPro ensures a cohesive and consistent workflow from creating a route or load entry to finalizing costs.
+TransPro is an integrated system designed to streamline vehicle fleet operations, load management, driver communication, and cost tracking. It provides a web-based interface for dispatchers or administrators to manage routes, drivers, loads, and vehicles, alongside a mobile app for drivers that enables real-time communication and operational updates (e.g., load details, messaging). By leveraging Spring Boot for the backend and Thymeleaf and Tailwind CSS (plus React Native) for the frontends, TransPro ensures a cohesive and consistent workflow from creating a route or load entry to finalizing costs.
 
 ## Features
 - **Driver Management**: Add, edit, and delete driver records. Include license details, tacho card info, categories, etc.
@@ -27,7 +27,7 @@ Below is a short `.mp4` file demonstrating the key functionalities of TransPro i
 ## Technology used
 
 ### Backend
-- **Spring Boot** (REST controllers, JPA repositories, security)
+- **Java Spring Boot** (REST controllers, JPA repositories, security)
 - **Spring Security** (JWT-based authentication)
 - **Hibernate & JPA** for ORM
 - **H2** in test environment
@@ -50,7 +50,7 @@ Below is a short `.mp4` file demonstrating the key functionalities of TransPro i
 ## Installation Guide
 
 ### Prerequisites
-- **Java 17+** (or whichever version required by your Spring Boot setup)
+- **Java 17+**
 - **Node.js** (preferably 14+ or 16+)
 - **npm** / **yarn**
 - **Maven** or **Gradle**
