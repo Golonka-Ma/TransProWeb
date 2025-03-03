@@ -135,8 +135,6 @@ Unit tests focus on individual service methods or repositories with `@MockBean` 
 ### IntegrationTest
 Integration tests spin up the entire Spring context, possibly an in-memory DB, to check the end-to-end flow from controllers to the real repository layer.
 
-### Api DOCUMENTATION
-For a comprehensive list of endpoints, request bodies, and responses, refer to the auto-generated docs (e.g., **Swagger** if integrated) or the dedicated [API documentation link](#) in the project resources.
 
 ---
 
