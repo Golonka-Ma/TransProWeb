@@ -3,6 +3,7 @@
 ## Project topic
 Real-time Transport Management and Driver Communication Platform
 
+
 ## Project description
 TransPro is an integrated system designed to streamline vehicle fleet operations, load management, driver communication, and cost tracking. It provides a web-based interface for dispatchers or administrators to manage routes, drivers, loads, and vehicles, alongside a mobile app for drivers that enables real-time communication and operational updates (e.g., load details, messaging). By leveraging Spring Boot for the backend and React (plus React Native) for the frontends, TransPro ensures a cohesive and consistent workflow from creating a route or load entry to finalizing costs.
 
@@ -27,21 +28,22 @@ Below is a short `.mp4` file demonstrating the key functionalities of TransPro i
 
 ### Backend
 - **Spring Boot** (REST controllers, JPA repositories, security)
-- **Hibernate/JPA** for ORM
-- **H2** or container-based database in test environment
+- **Spring Security** (JWT-based authentication)
+- **Hibernate & JPA** for ORM
+- **H2** in test environment
 - **PostgreSQL** (or another RDBMS) in production
 
 ### Frontend
-- **React** with **Thymeleaf** or a separate SPA for the main web interface (DataTables, modals, etc.)
+- **Thymeleaf** with **Tailwind CSS**
 - **React Native** (Expo) for the mobile driver application
 - **Axios** for HTTP requests
+- **
 
 ### Build and test tools
 - **Maven** or **Gradle** for building the backend
 - **npm** / **yarn** for the frontend
 - **JUnit 5** and **Mockito** for unit tests
 - **Spring Boot Test** with **MockMvc** for integration tests
-- **Docker** / **Testcontainers** for container-based environments in testing (optional)
 
 ---
 
@@ -52,22 +54,39 @@ Below is a short `.mp4` file demonstrating the key functionalities of TransPro i
 - **Node.js** (preferably 14+ or 16+)
 - **npm** / **yarn**
 - **Maven** or **Gradle**
-- **Docker** (optional, if using Testcontainers or container-based DBs)
 
-### Backend setup
-1. Clone this repository or download the code.
-2. Navigate to `backend/` (or the root directory containing the Spring Boot app).
-3. Adjust any database connection properties in `application.properties` (if not using in-memory H2).
-4. Build the project (`mvn clean install` or equivalent in Gradle).
-5. (Optional) For testing with in-memory DB (H2), ensure that `spring.datasource.url` points to an in-memory config.
-6. Run the Spring Boot application via `mvn spring-boot:run` or `java -jar target/transpro-backend.jar`.
+### Backend Setup
+1. Clone the repository.
+2. Navigate to the backend directory:
+   ```sh
+   cd schedule backend
+   ```
+3. Set up your **application.properties** file for database connection:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/schedule_app
+   spring.datasource.username=root
+   spring.datasource.password=your_password
+   spring.jpa.hibernate.ddl-auto=update
+   ```
+4. Run the backend application:
+   ```sh
+   ./mvnw spring-boot:run
+   ```
 
-### Frontend setup
-1. Navigate to `frontend/` for the web interface (React + DataTables) or to the mobile app folder (React Native).
-2. Install dependencies (`npm install` or `yarn`).
-3. Adjust any config (like API base URL) in `.env` or similar config files to match your backend address.
-4. Start the development server for the web front (`npm start` or `yarn start`) or run `expo start` for the mobile app.
-
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```sh
+   cd schedule frontend
+   ```
+2. Install the dependencies:
+   ```sh
+   npm install
+   ```
+3. Start the frontend development server:
+   ```sh
+   npm start
+   ```
+4. Access the application at **http://localhost:3000**.
 ---
 
 ## Usage
@@ -98,7 +117,7 @@ Active development includes:
 ## Running the project
 
 ### Prerequisites
-Ensure Java, Node, npm/yarn, and optionally Docker are installed. Check environment variables for correct database config.
+Ensure Java, Node, npm/yarn are installed. Check environment variables for correct database config.
 
 ### BackEnd (Spring Boot)
 - Inside the backend folder: `mvn spring-boot:run` (or the Gradle equivalent)  
