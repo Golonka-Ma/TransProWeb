@@ -25,7 +25,8 @@ https://github.com/user-attachments/assets/dec1fd54-8dee-494c-9102-ffca3a3fc834
 
 ## Full Project Documentation
 For a detailed explanation of TransPro, including its architecture, implementation, and technical decisions, you can read my BSc Thesis:
-[TransPro_Thesis.pdf](https://github.com/user-attachments/files/19061417/TransPro_Thesis.pdf)
+[TransPro_Thesis.pdf.pdf](https://github.com/user-attachments/files/19069844/TransPro_Thesis.pdf.pdf)
+
 
 
 ## Technology used
